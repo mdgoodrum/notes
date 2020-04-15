@@ -1260,6 +1260,242 @@ You can’t change set outside of the class.
 
 (4.3 4.4)
 
+As is the case in Java, all Kotlin classes have several methods you may want to override:
+toString(), equals(), and hashCode(). Let’s look at what these methods are and how
+Kotlin can help you generate their implementations automatically
+
+class Client(val name: String, val postalCode: Int)
+	{ override fun equals(other: Any?): Boolean {
+		if (other == null || other !is Client)
+			return false
+	return name == other.name &&
+		postalCode == other.postalCode
+	}
+	override fun toString() = "Client(name=$name, postalCode=$postalCode)"
+}
+
+
+Here we override the common methods, equals, and toString
+
+"Any" is the analogue of java.lang.Object: a superclass of all classes in Kotlin. The
+nullable type "Any?" means "other" can be null.
+
+Checks whether "other" is a Client
+
+Checks whether the corresponding properties are equal
+
+Just to remind you, the is check in Kotlin is the analogue of instanceof in Java.
+
+The hashCode method should be always overridden together with equals
+
+Let’s create a set with one element: a client named Alice. When you check whether
+this set contains the client with the same name and postal code, you consider such objects
+to be equal, but the set doesn’t contain it:
+
+>>> val processed = setOf(Client("Alice", 342562))
+>>> println(processed.contains(Client("Alice", 342562)))
+false
+
+The reason is that the Client class is missing the hashCode method. Therefore, it
+violates the general hashCode contract: if two objects are equal, they must have the same
+hash code.
+
+To fix that, you can add the implementation of hashCode() to the class:
+
+class Client(val name: String, val postalCode: Int) {
+	...
+	override fun hashCode(): Int = name.hashCode() * 31 + postalCode
+}
+
+If you want your class to be a convenient holder for your data, don’t forget to override
+these methods: toString, equals, and hashCode. If you add
+the modifier data to your class, all the necessary methods are automatically generated
+for you:
+
+data class Client(val name: String, val postalCode: Int)
+
+This will automatically override hashCode, equals and toString
+
+Also in Kotlin you can compare objects with == it'll default to using .equals
+
+To make it even easier to use data classes as immutable objects, the Kotlin compiler
+generates one more method for them: a method that allows you to copy the instances of
+your classes, this will create a deep copy of the object
+
+You can also pass values to copy if you want to change properties
+
+A common problem in the design of large object-oriented systems is fragility caused by
+implementation inheritance. When you extend a class and override some of its methods, your code becomes dependent on the implementation details of the class youre extending
+
+The design of Kotlin recognizes this problem and treats classes as final by default.
+
+Whenever you’re implementing an interface, you can say that you’re delegating
+the implementation of the interface to another object, using the by keyword. Here’s how
+you can use this approach to rewrite the previous example:
+
+class DelegatingCollection<T>(
+	innerList: Collection<T> = ArrayList<T>()
+) : Collection<T> by innerList {}
+
+Delegates the Collection implementation to innerList
+
+
+As you can see, all the method implementations in the class are gone. The compiler
+will generate them, and the implementation is similar to that in the
+DelegatingCollection example
+
+Now, when you need to change the behavior of some methods, you can override
+them, and your code will be called instead of the generated methods.
+
+
+
+The object keyword comes up in Kotlin in a number of cases, but they all share the
+same core idea: the keyword defines a class and creates an instance:
+
+-Object declaration is a way to define a singleton.
+ 
+-Companion objects can contain factory methods and other methods that are related to this
+class but don’t require a class instance to be called. Their members can be accessed via
+class name. 
+
+-Object expression is used instead of Java’s anonymous inner class
+
+
+object declaration
+feature. The object declaration combines a class declaration and a declaration of a single
+instance of that class.
+
+object Payroll {
+	val allEmployees = arrayListOf<Person>()
+
+	fun calculateSalary() {
+		for (person in allEmployees) {
+		...
+		}
+	}
+}
+
+Just like a class, an object declaration can contain declarations of properties, methods, initializer blocks, and so on. The only things that aren’t allowed are constructors (either
+primary or secondary)
+
+Unlike instances of regular classes, object declarations are created
+immediately at the point of definition, not through constructor calls from other places in
+the code.
+
+And just like a variable, an object declaration lets you call methods and access
+properties by using the object name to the left of the . character:
+
+Payroll.allEmployees.add(Person(...))
+Payroll.calculateSalary()
+
+You can also declare objects in a class.
+
+data class Person(val name: String) {
+	object NameComparator : Comparator<Person> {
+		override fun compare(p1: Person, p2: Person): Int =
+			p1.name.compareTo(p2.name)
+	}
+}
+>>> val persons = listOf(Person("Bob"), Person("Alice"))
+>>> println(persons.sortedWith(Person.NameComparator))
+[Person(name="Alice"), Person(name="Bob")]
+
+Companion objects: a place for factory methods and static members
+
+A companion object is a regular object that is declared in a class
+
+Classes in Kotlin can’t have static members; Java’s static keyword isn’t part of the
+Kotlin language. As a replacement, Kotlin relies on package-level functions (which can
+replace Java’s static methods in many situations) and object declarations (which replace
+Java static methods in other cases, as well as static fields).
+
+if you need to write a function that can be called
+without having a class instance but needs access to the internals of a class, you can write
+it as a member of an object declaration inside that class. An example of such a function
+would be a factory method
+
+One of the objects defined in a class can be marked with a special keyword, companion. If you do that, you gain the ability to access the methods and properties of
+that object directly through the name of the containing class, without specifying the name
+of the object explicitly
+
+class A {
+	companion object
+		{ fun bar() {
+			println("Companion object called")
+		}
+	}
+}
+>>> A.bar()
+Companion object called
+
+
+class User {
+	val nickname: String
+
+	constructor(email: String) {
+		nickname = email.substringBefore('@')
+	}
+
+	constructor(facebookAccountId: Int) {
+		nickname = getFacebookName(facebookAccountId)
+	}
+}
+
+These are Secondary constructors
+
+An alternative approach to express the same logic, which may be beneficial for many
+reasons, is to use factory methods to create instances of the class
+
+class User(val nickname: String)
+	{ companion object {
+		fun newSubscribingUser(email: String) =
+			User(email.substringBefore('@'))
+
+		fun newFacebookUser(accountId: Int) =
+			User(getFacebookName(accountId))
+	}
+}
+
+You can invoke the methods of companion object via the class name
+
+>>> val subscribingUser = User.newSubscribingUser("bob@gmail.com")
+>>> val facebookUser = User.newFacebookUser(4)
+>>> println(subscribingUser.nickname)
+bob
+
+Factory methods are very useful. They can be named according to their purpose, as
+shown in the example
+
+For example, you can ensure that every email corresponds to a unique User
+instance, and return an existing instance instead of a new one when the factory method is
+called with an email that’s already in the cache. But if you need to extend such classes, using several constructors may be a better solution, because companion object members
+can’t be overridden in subclasses
+
+// business logic module
+class Person(val firstName: String, val lastName: String) {
+	companion object {
+	}
+}
+
+// client/server communication module
+fun Person.Companion.fromJSON(json: String): Person {
+...
+}
+val p = Person.fromJSON(json)
+
+Declares an empty companion object
+Declares an extension function
+
+Chapter 5: lambdas
+
+
+
+
+
+
+
+
+
 
 
 
