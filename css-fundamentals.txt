@@ -1,0 +1,274 @@
+h1 {
+	color: red;
+}
+
+this will cause the h1 tag to have the property color set to red
+make sure there is always a semi colon after each declaration
+
+you can use the wildcard * if you want it to effect all tags
+
+if the selector starts with a . it means its referencing the class
+
+.myH1 {
+	color: red;
+}
+
+will apply to tags with class="myH1"
+
+to target an element we will start with the #
+therefore
+
+#myH1 {
+	color: red;
+}
+
+will target tags with id="myH1"
+
+if we want to select on an attribute we enclose in []
+therefore
+
+[my-id='myH1'] {
+	color: red;
+}
+
+will target tags with my-id='myH1'
+
+when multiple selectors are targeting an element the browser needs to know which one to give priority to
+
+!important > inline styles > ids > classes > element is the precendence
+
+important example
+
+.myH1 {
+	color: red !important;
+}
+
+if you have multiple styles to the same priority level, css gives priority to the last one
+hence the name cascating style sheet, it cascades down
+
+inhenritance is the idea that some properties get passed down the the children of that tag
+
+for example, if you set 
+
+ul {
+	color: blue;
+}
+
+you will set to blue all the children (li) of the unordered list
+
+most inherited properties have to do with text styles for example:
+color, font, font-family, font-size
+
+the ones that do not are padding, margin, height and width
+
+you can set properties to inherit and initial, initial being whatever the default is before styles
+
+if you right click an item and click inspect you will see the css styles applied to a given item
+here you can modify the styles and see the results immediatly. It will also show you where its
+getting its properties from (so you can check if its inheriting from the correct place)
+
+clicking hov will also show if it has active, hover, etc styles
+
+on the right side you can see the box model of the element
+
+the CSS box model is the foundation of layout on the web
+each item is represented as a box with padding border and margin as larger boxes around it
+
+adding padding and border will increase the size of the overall box
+the default value for box-sizing is content-box, changing this to border-box
+will make the box be whatever size youve set it to.
+
+changing display: inline will ignore the width and height you have set
+
+pixels are an absolute value, em is a relative value, em goes off the font size
+
+rem is the same as em but it goes off the default font size which is 16px
+
+we can also set these values to percentages, which are calculated off the parent size
+
+we can set colors with names like blue, red, green or we can use hex values like #ff0000
+or we can use rgb(255, 0, 0), we can also use hsl (hue, saturation, lightness) like hsl(0, 100%, 50%)
+first value is the degree on the color wheel between 0 and 360 and the other two are percentages
+
+we can add a background to one of our tags by setting the background field
+
+.content {
+	background: url('img/foo.jpg');
+}
+
+will add the image at img/foo.jpg to the background of our class='content'
+
+.content {
+	background: url('img/foo.jpg');
+	background-size: cover;
+}
+
+will scale the image as much as possible without stretching it
+
+.content {
+	background: url('img/foo.jpg')center/cover no-repeat;
+}
+
+will set several styles without needing to name each one
+
+.content {
+	background: radial-gradient(crimson, skyblue);
+}
+
+will pass a gradient to the background of the given colors, it will apply like an image
+
+.content {
+	background: radial-gradient(crimson, skyblue)fixed;
+}
+
+will give it a paralax feel
+
+h1 {
+	opacity: 0;
+}
+
+will hide an element, however it will still be taking up space
+determines the level of transparency of the element
+
+h1 {
+	visibility: hidden;
+}
+
+has the same effect where you cant see it but it still takes up space on the page
+
+h1 {
+	display: none;
+}
+
+will hide the element and have it not take up any space on the page
+in other words it wont be included in the layout of the page
+
+h1 {
+	font-size: 34px;
+	font-style: italic; (normal, oblique, unset)
+	font-family: 'Open Sans'; (sans-serif) Open Sans in this case is coming from a pre downloaded style
+	letter-spacing: 2px; width between each letter
+	text-transform: uppercase;
+	font-weight: 300; thickness of the text
+}
+
+h1 {
+	font: italic 300 34px 'Open Sans';
+}
+
+font shorthand allows us to set several of these properties at once
+
+--------------------------------------
+
+<div class='parent'>
+	<div class='child'></div>
+</div>
+
+.parent {
+	padding: 20px;
+	border: solid 2px blue;
+}
+
+.child {
+	padding: 20px; 
+	background: red;
+	position: relative;
+	top: 20px; (can be pushed from left, right, bottom, top or using an x index)
+}
+
+position helps us manipulate the position of the element
+relative: keeps original position with the flow of the document
+absolute: will break from the flow of the page, this will change based on which
+parent is relative
+fixed: always relative to the document and not parent element, scrolling wont effect this either
+
+li a:hover {
+	color: red;
+}
+
+this is a sudo class, style is applied when you are hovering the element
+
+li:first-child a {
+	color: blue;
+}
+
+will style the first child 
+
+input: focus {
+	outline-color: green;
+}
+
+will make the border of a text input field green when in focus (when the cursor is inside it)
+
+:nth-child(
+	
+)
+
+
+:visited
+
+these are two example of sudo classes, first one targets nth child second targets visited links
+
+ul {
+	display: flex;
+	justify-content: space-between;
+}
+
+setting display to flex puts our elements inside a flex container
+flex helps dinamically display items
+
+@media (max-width: 700px) { // when this is true the style is applied, you can and these together
+	ul {
+		display: block;
+	}
+}
+
+The @media rule is used in media queries to apply different styles for different media types/devices.
+
+Media queries can be used to check many things, such as:
+
+width and height of the viewport
+width and height of the device
+orientation (is the tablet/phone in landscape or portrait mode?)
+resolution
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,177 @@
+ssh-keygen (SSH = secure socket shell)
+
+generates ssh public/private rsa key pair
+
+id_rsa is the private key
+
+id_rsa.pub is the public key, you can modify the public key after the space, this is treated as a comment
+
+next step, copy public key to the remote server you wish to authenticate against
+
+ssh-copy-id root@ip_address
+
+to ssh into the remote server then
+
+ssh root@ip_address
+
+if you do ssh root@ip_address hostname
+
+this will run hostname in the remote without opening bash and then will immediatly close
+
+-------------------------------
+
+ssh config file allows you to connect to an ssh server more simply
+
+ssh config format: starts with host directive, rest is optional 
+
+example: 
+
+Host foo
+	HostName 104.107.227.8
+
+now you can do ssh root@foo
+
+Host foo
+	HostName 104.107.227.8
+	User root
+	IdentityFile ~/.ssh/id_rsa
+	Port 22
+
+this will allow me to do 'ssh foo'
+
+-------------------------------
+
+scp (secure copy command)
+
+allows you to copy files to and from a remote host
+
+scp file remote:where it goes
+
+example
+
+scp test.txt michaelgoodrum@10.0.0.48:~/Documents
+
+if you want to use another key then do -i path to other key
+
+passing -r will pass the whole directory
+
+to copy from remote to where you are
+
+scp michaelgoodrum@10.0.0.48:~/Documents/test.txt ~/Documents/test.txt
+
+first arg is file to be transfered second is where you want it transfered to
+
+-------------------------------
+
+On network which is blocking access to a specific web site
+you can get around this with an ssh tunel and local port forwarding
+
+-L: tells ssh to open a local tunel, value of flag is port being used
+
+ex: ssh -L 8000:yahoo.com:80 root@remote.com
+
+this will forward port 8000 over to yahoo.com on port 80 of the remote host root@remote.com
+
+if you pass -f it will run in the background and -N will make it not open a new shell window
+
+therefore ssh -f -N -L 8080:yahoo.com:80 root@remote.com will likely be how you want to use this
+
+since this runs in the background you can look it up with
+
+ps aux | grep ssh
+
+to stop it run kill and the id of the process
+
+-------------------------------
+
+Another use of ssh tunels is to forward remote ports
+this will forward things back to our localhost 
+
+this is disabled by default so you need to alter your config file (usually located at /etc/ssh/sshd_config)
+
+set the GatewayPorts configuration value to yes
+
+running sudo launchctl stop com.openssh.sshd (on OSx) will kill ssh and it will automatically restart)
+
+ssh -R 8000:localhost:3000 root@remote.com
+
+this will make the remote 3000 open the 8000 port on your local machine
+
+-------------------------------
+
+~. will stop a frozen ssh instance
+
+~ + ctrl + z will send the ssh session into the background
+
+f + g + enter will reconnect to the session
+
+-------------------------------
+
+once you ssh into a remote host, the server fingerprint and key are added to ~/.ssh/known_hosts
+
+if you try connecting to a new machine that has been assigned an ip address youve previously used to connect to another server you will get a host mistmatch error
+
+once in a ssh server type: ssh-keygen -l -f /etc/ssh/ssh_host_ecds_key.pub will return the fingerprint of the server
+
+ssh-keygen -R ip_address will remove all known keys belonging to the specified host
+
+now if you try to connect again you will get a prompt, make sure the fingerprint is the same and if so youre good
+
+-------------------------------
+
+changes to make ssh more secure
+
+modify file /etc/ssh/sshd_config
+
+set PermitRootLogin to prohibit-password
+
+-------------------------------
+
+connection attempts are logged at /var/log/auth.log
+
+the file ~/.bash_history will contain the history of all command run in bash by the logged in user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

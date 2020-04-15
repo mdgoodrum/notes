@@ -1,0 +1,773 @@
+Chapter 1: Getting started
+
+Unix was developed at AT&T Bell labs. The project was originally named Multics (MULTiplexed Information and Computing Service). After the project became too large AT&T dropped the project. A group from Bell Labs decided to pick the project back up and simplifying it, renaming it Unix.
+
+Oracle Solaris, Apple OS X, HP-UX and IBM AIX are the only fully unix system. All others are Unix like.
+
+The kernal is a program that gets loaded into memory at boot-up time. This program manages everything until shutdown. It is responsible for loading programs and cleaning up the system on finish.
+
+The shell is the program that starts up when you log into a unix system. This is where you type your commands and is how you interact with the kernel.
+
+basic commands 
+
+ps: lists the current running processes
+ps $$: lists the name of the current shell
+bash: switches shell to bash
+bash --version: lists the current bash version
+clear: clears whats displayed in the shell
+whoami: shows the users name
+hostname: shows the computer name
+exit: closes the shell
+type COMMAND_NAME: returns whether COMMAND_NAME is a token recognized as a built-in shell command, or the location of the recognized program, or display a message if none can be found
+echo: prints
+echo -n: prints ommiting newline characters
+pwd: print working directory
+ls: list files in directory
+
+wild cards
+
+?: any single character
+*: any string of characters
+[set]: any character in set
+[!set]: any character not in set
+
+metacharacters
+
+{} example: echo s{i,o,a}ong prints 'sing song sang' remember not to put spaces inside the {}
+[] example: [ac]  matches a or c, [a-c] matches a, b and c
+
+..: alias for previous directory
+~: alis for home directory
+`: command substitution (old style)
+#: comment
+$: variable expression
+&: background job
+*: string wildcard
+(: start of subshell
+): end of subshell
+\: escape next character
+|: pipe
+[: start of wildcard set
+]: end of wildcard set
+{: start of command block
+}: end of command block
+;: pipeline command separator
+': quote mark (strong)
+": quote mark (weak)
+<: redirect input
+>: redirect output
+/: pathname address separator
+?: single-character wildcard
+!: pipeline logical NOT
+
+getting help
+
+help: returns information on all build in commands
+help | more: returns the information one page at a time
+help COMMAND_NAME: returns info on that specific COMMAND_NAME
+q: quits pagination
+man COMMAND_NAME: returns manual for COMMAND_NAME
+
+Chapter 2: Managing files
+
+basename: extracts the name of a file, program, or directory, from the end of a path address
+dirname: remove the final part of the path address to a file
+mkdir: creates new directory
+rmdir: deletes empty directory, if it contains anything it will just return a warning and wont delete
+rmdir -ri: asks one by one to delete each file in the directory and then prompts to delete the empty directory
+rmdir -r: deletes everything in the directory and the directory without prompting
+mv: moves file from one location to another, first param is the file to be moved second is destination
+cp: copies files, can take any number of arguments, last argument is where files will be pasted
+rm: delete one or more files named as its arguments, passing * will delete all files in a directory
+cat: displays text contained in a file
+cat -n: adds line numbers to the output
+ln: creates a hard link between two files
+ln -s: creates a soft link between two files
+
+Difference between soft and hard link
+	Unix files comrise two parts, the filename and the actual data. The filename is allocated an "inode" that points to the data. Hard links are allocated the same inode as their target so both point to the data. Soft links on the other hand are allocated a different inode that marely points to the target file
+
+ls -i: displays the file inodes
+stat: lists every important attribute of the file stated as its argument
+wc: counts how many lines, words and bytes are in a text file
+file: resports what type of file input is
+touch: creates an empty file
+touch -t: allows you to specify a date and time in format MMDDhhmm.ss
+touch -d: allows you to specify a date and time in format "YYYY-MM-DD hh:mm:ss"
+cmp: compares two files, if they are identical nothing is returned if they are not it returns the location of first diff
+comm: compares text files line by line, it returns three columns
+	1 - lines found in the first file, but not in the second
+	2 - lines found in the second file, but not the first
+	3 - lines found in both files
+
+diff: also used to compare text files, can also be used to compare directories
+md5sum: produces a 32-byte checksum, this should match the original file if its untouched
+cksum: generates CRC (cyclic redundancy check), which includes byte size in output
+
+find: helps find file on your system, this command can take over 50 flags but the usual use is
+	find DirectoryName -type f -name FileName
+	DirectoryName will be the root source that is the starting point of the search
+	type f means you are looking for a file
+	passing the -L option will return soft links as well
+	passing -newer sorts by their timestamps
+	passing -exec allows you to perform an action on each result, must end with {} and \;
+		find ~ -type f -name dino* -exec file {} \;
+			this will seek all files in your home directory whose name starts with dino and will deplays their file type
+
+gzip: compresses one or more files
+gunzip: extracts compressed files
+du: reports the number of 512-byte blocks occupied by the file, passing -k returns results in kilobytes
+bzip2: same as gzip, not as used
+bunzip2: extracts compressed files that used bzip2
+unzip: unzips files compressed in windows, wont delete zipped file like above unziping methods
+
+Passing -c to gunzip, bunzip2, unzip will display the contents of compressed text files on standard output
+
+cpio: copy output to an archive or copy input from an archive, must always have a -i < or -o > to specify direction of data
+	result of an ls command can be directed to the cpio command using a | to easily archive all contents of a directory
+	this command is often used to create backups
+
+tar: tape archive, alternative backup with a -cf option to create files and an -xf option to extract files
+	arguably less efficient but has simpler syntax is more commonly used
+	example: tar -cf ../archive.tar, creates backup - tar -xf ../archive.tar brings the backup back
+	can also pass -z to work with compressed 'tarball'
+
+A tarball is a compressed tar archive and typically has a file extension .tar.gz or .tgz, they are used for source code packages
+
+You can use cpio -it or tar -tf to retrive a table of contents from a backup archive
+
+Chapter 3: Handling Text
+
+cat file1 file2 > file3 will combine the contents of file1 and file2 and create file3,
+if you would like to apprend to file3 use >> instead
+more: scrolls forwards, doesnt scroll backwards
+less: allows you to scroll both forwards and backwards
+
+the output of a command can be redirected to become input for another command using the pipe | command
+this creates whats called a pipeline
+
+head: displays by default the first 10 lines 
+tail: displays by default the last 10 lines
+
+ex: cat -b ballad.txt | head -6 displays the first 6 lines of ballad.txt with numbers for non empty lines
+		cat -b ballad.txt | tail -6 displays the last 6 lines of ballad.txt with numbers for non empty lines
+
+
+grep: seeks a given string withing a specified text file, defaults to displaying each line the string is found
+
+ex: grep 'sword' ballad.txt to seek for the word 'sword' in ballad.txt
+
+passing -n to grep will return which line the result is from
+
+you can use grep on more then one file at a time, results will then contain the file they were from on the left
+
+passing -l to grep when searching multiple files will return the results without the file names
+
+you can invert a grep search by passing -v, this will return all results where the string is not found
+
+grep by default is case sensitive, passing -i will make it case insensitive
+
+sort: sorts lines alphabetically, priority is spaces then digits then letter, lowercase before uppercase
+
+you can pass more then one argument to sort, passing -o will send output to a file, tee will display result and store in a file
+
+ex: sort fruit.txt | tee sortedFruit.txt
+
+passing -u will remove duplicates, piping results to the uniq command also has this effect
+
+paste: arranges lines of text into columns delimited by an invisible Tab character
+			 each column is regarded as a numbered field that can be selected by specifying
+			 its field number to a -f option of the cut command
+
+ex: cat abc.txt def.txt ghi.txt, will display the contents of each of these immediatly after each other
+		
+		paste abc.txt def.txt ghi.txt, will display abc.txt contents separated from def.txt with a tab and ghi.txt with another tab
+
+		paste abc.txt def.txt ghi.txt | cut -f2 will display only def.txt
+
+		paste abc.txt def.txt ghi.txt | cut -f1,3 will display abc.txt and ghi.txt (this can also accept a range with -)
+
+		passing -s to paste will arrange the files in sequence along each row
+
+		passing a value to -d will split the columns by that instead of tab, -d: will split with colons
+
+
+tr: (translate) first argument specifies the character to be replaced and the second is the replacement character
+		
+		the arguments can also map several characters to several alternatives
+		you can also pass a range, often used to convert lowercase to uppercase
+
+ex: echo Simple Clip | tr 'i' 'a' will return Sample Clap
+		
+		echo String Up | tr 'ti' 'pa' will return Sprang Up
+
+		echo Sit On | tr '[a-z]' '[A-Z]' will return SIT ON
+
+
+sed: (stream editor) replaces occurences of a specific string for another
+		 
+		 three parts, 's/old/new/', this will only substitute first hit, adding g after the last / will
+		 cause the effect on all matches
+
+ex: echo good day | sed 's/day/night/' will return good night
+
+[a-z]* will match the first occurence of any lowercase string on each line
+
+therefore echo hot day | sed 's/[a-z]*/(&)/' will add parentheses around the first lowercase string 
+
+echo hot day | sed 's/[a-z]*/(&)(&)/' will replace the first string with two parenthesized versions
+
+echo hot day | sed 's/[a-z]*/(&)/g' will add parenthesis to each lowercase string globally
+
+nano: launches a text editor
+
+ctrl + G opens the online Help system
+ctrl + X closes it
+arrows can be used to move around
+ctrl + O will show a status bar requesting a file name to write, stores in your ~ directory by default
+
+vi: (visual) another popular text editor 
+
+vi by default opens in Command Mode, it will interpret input as commands
+
+pressing i will go into Insert mode which will allow you to type text
+
+to save your text as a file click esc to leave Insert mode and go back into Command Mode
+
+in Command Mode click :w filename.txt (w stands for write) and hit return
+
+:q will quit
+
+Chapter 4: Editing commands
+
+There are two command-editing modes, Emacs (Editing Macros) and Vi (Visual)
+
+to go into emacs mode run
+
+set -o emacs
+
+Emacs has several editing functions like
+
+Ctrl + F: Move hte cursor forward one character
+Ctrl + B: Move the curso back one chatacter
+Ctrl + D: Delete one character at cursor
+Esc F: Move the cursor forward one word
+Esc B: Move the cursor back one word
+Esc D: Delete the word after the cursor
+Esc Backspace: Remove the word before the cursor
+Ctrl + Y: Yank (retrieve) the words last deleted
+Ctrl + A: okace teh cursor at the start of the line
+Ctrl + E: Move the cursor to the end of the line
+Ctrl + K: Lill (remove) all from cursor to the line end
+Ctrl + U: Remove all from the line start up to the cursor
+Ctrl + P: scroll back to previous command in history
+Ctrl + N: scroll forward to the next command in history
+Ctrl + R: make a reverse-intelligent-search in history
+Ctrl + L: clear screen placing current line at top
+Ctrl + M: hit return 
+Ctrl + T: transpose current and previous characters, then move the cursor forward one character
+Esc C: capitalize the word at or next after the cursor
+Esc U: uppercase the word at or next after the cursor 
+Esc L: lowercase the word at or next after the cursor
+Esc .: insert last word of previous command line
+
+Emacs also has several completing functions like
+
+Tab: attempt general completion
+Esc ?: display a list of possibilities
+Esc /: attempt filename completion
+Ctrl + X /: display a list of possible filenames
+Esc ~: attempt username completion
+Ctrl + X ~: display a list of possible usernames
+Esc $: attempt variables name completion
+Ctrl + X $: display a list of possible variable names
+Esc @: attempt hostname completion
+Ctrl + X @: display a list of possible hostnames
+Esc !: attempt command name completion
+Ctrl + X !: display a list of possible command names
+
+(In the terminal in general pressing Ctrl + D will close out the window)
+
+You can type a command then use these to edit them if you notice you didnt have the expected behavior
+
+To go into Vi mode run
+
+set -o vi
+
+When in Control Mode in vi the following commands alow you to edit the macro
+
+H: move left one character
+L: move right one character 
+B: move to the start of current word, or if at the word start move to the start of the word to the left
+W: move to the start of the word to the right
+E: move to the end of the current word
+0 (zero): move to the start of the line
+$: move to the end of the line
+
+All the commands above except 0 and $ can have a digit before it to represent how many times to do it
+
+(more Control Mode commands)
+
+I: insert text before the current character
+A: append text after the current character
+Shift + I: insert text at the start of the line
+Shift + A: append text at the end of the line
+Shift + R: overwrite existing text at the current position 
+DL: delete current character (shortcut x)
+DH: delete one character back (shortcut Shift + X)
+DW: delete word forward
+DB: delete word back
+DD: delete entire line
+DO: delete to the start of the line
+D$: delete to the end of the line (shortcut Shift + D)
+U: undo previous deletions
+K: scroll back one line (shortcut -)
+J: scroll forward one line (shortcut +)
+/string: search back for the specified string
+?string: search forward for the specified string
+n: repeat a search in the same direction
+N: repeat a search in the opposite direction
+F char: move right onto the specified character
+Shift + F char: move left onto the specified character
+T char: move right up to the specified character
+;: repeat last search into the same direction
+,: repeat last search in the opposite direction
+
+(history commands, bash)
+
+history: display all previous commands issued, it can accept a numerical argument to limit how far back in history to display
+fc: (fix command) after running history pass value of command to fc to open that command fo editing
+!!: last command
+!n: command number n
+!-n: current command number minus n
+!string: most recent command beginning with string
+!?string: most recent command containing string
+^str1^str2: kast command replacing str1 with str2
+:0: the first word in the line
+:n: the nth word in the line
+:^: the second word in the line
+:$: the last word in the line
+:%: most recent !?string search result word
+:*: all words except the first word
+:h: remove trailing part of path address
+:r: remove trailing file extension
+:e: remove all exept trailing file extensions
+:t: remove leading part of path address
+:p: display command but do not execute
+:q: enclose in quote marks
+:x: break words at spaces and enclose in quotes
+:s/old/new/: substitute old for new
+
+Chapter 5: Customizing Environment
+
+sudo: command to allow another command to be executed as another user (usually root)
+reboot: restarts computer, must have root priviledge
+sudo passwrd root: allows you to set a password for root
+
+the root superuser can add new regular users by using
+
+useradd user
+
+users can also be removed by root using the
+
+userdel user
+
+command
+
+groups allow you to set several users permisions
+
+groupadd board
+
+will create a new group called board
+
+useradd mike
+
+groups mike
+
+will display staff as this is the default group for new users
+
+usermod -G board mike 
+
+will switch mike to the board group
+
+groups mike will now diplay
+
+staff board
+
+every file has a permisions settings, r (read 4) w (write 2) x (execute 1)
+
+if you have several settings they can also be displayed as the sum of the permissions
+
+chmod: changes the permissions
+chown: changes ownership 
+chgrp: changes group
+
+ls --color: will attempt to list the current directory contents in color
+
+you can specify aliases for long commands or commands you envoke with certain parameters often
+
+alias name='command' 
+
+ex: alias now='date + %H:%M'
+
+aliases will be lost when you exit the session, you can make them permanent by adding them to the
+.bashrc file
+
+set -o: displays all the bash default options and what they are set to
+shopt: displays a list of further options and their status
+
+Bash provides four prompt strings whose format is stored in shell variables PS1, PS2, PS3, PS4
+The format of prompt strings can be customized to include your preferred information using the commands
+listed in the table bellow
+
+\A: Current time in 24-0hour HH:MM format
+\d: Current date as weekday, month, day number
+\e: ASCII escape character (033)
+\h: host name
+\n: newline character
+\s: shell name
+\T: Current time in 12-our HH:MM format
+\V: shell version number
+\w: current working directory
+\#: Current session command number
+\!: Current histpry command number
+\n\n\n: Character octal code number
+\\: print bacjslash
+\[: start sequence of non-printing characters
+\]: end sequence of non-printing characters
+
+Chapter 6: Controlling behavior
+
+The shell by default looks for aliases for a command first, if no match, then it looks for
+a built in command with the exact name, if no match then it will look in the PATH
+list with the specified command name. Therefore if you set an alias that is the same as a command
+that already exists, the alias will be invoked and not the actual command.
+
+command: run without checking for aliases
+builtin: run without checking aliases or PATH
+
+built in commands are all enabled by default but can be individually disabled
+by specifying a command name to an enable -n command, to enable again do the same 
+thing without passing the -n flag
+
+printf: more powerfull version of echo that allows you to format output
+
+%c: character
+%s: string
+%d: decimal integer
+%f: floating-point number
+%u: unsigned decimal integer
+%x: unsigned hexadecimal with a-f
+%X: unsigned hexadecimal with A-F
+%o: unsigned octal number
+
+a format specifier may also include a numerical field width value immediately
+after the % character. A positive value will add spaces before the output where
+it is less than the field size (right justify) a negative value will add spaces
+after the output where it is less thatn field size (left justify)
+
+for floating point numbers a format specifier may additionally include a precision value
+immediately after the % character. This is a period '.' followed by a numeroal value specifying
+how many digits should appear after the decimal point
+
+read: gathers input from the command line or from a file
+
+the input to read will be stored in the $REPLY variable
+
+ex: read flavor version, will store two space separated values in $FLAVOR and $VERSION
+
+to pass a file you can do read < file.txt
+
+$(): allows you to pass output from a command into another instead of going to standard output
+
+ex: echo $(pwd) will print out what running pwd would have printed
+
+typing the name of a program will usually open it, to open it in the background add a space and &
+
+to see all jobs currently running type jobs
+
+fg &jobNumber: brings a background job to the foreground
+bg &jobNumber: resumes a suspended job
+
+the jobs command only pulls up processes started up by you in the terminal
+the ps command pulls up all processes, passing the -a flag will include what
+the jobs command would output as well
+
+kill jobNumber: stops process number jobNumber
+
+mkfifo: allows you to create a named pipe
+
+ex: mkfifo mypipe, ls -l mypipe, ls > mypipe
+
+each time you create a new shell it receives a unique ID
+
+$BASHPID: unique id of the current shell
+
+wait: ensured background process finishes before closing
+
+Chapter 7: Performing operations
+
+You can assign a value to a variable by typing
+
+var='Hello World!'
+
+Echo $var will return Hello World!
+
+This is usually used in shell scripts
+
+Make sure when writing scripts to change the permission to make it
+Executable with chmod +x
+
+Simple script example
+
+echo -n 'Please enter your name: '
+read var
+echo "Welcome to $@, $var"
+
+This script will take the name inputed and then print it out with 
+$@ being subbed for whatever is passed to the script when executed
+And $var being what the user typed, therefore running
+./script.sh Unix in easy steps
+Will print 
+Welcome to Unix in easy steps, whateverUserTypes
+
+You can also store arrays as following
+arr=('first thing' 'second thing' 'third thing')
+
+And can be indexed as arr[index]
+
+String Manipulation
+
+${var:-string}: return var value or string
+${var:=string}: return var value, or string - but cannot be used to test positional parameters
+${var:?string}: return var value, or string then exit script
+${var:+string}: return string, or null if absent
+${var:pos:len}: return substring of car of length Len starting at character position pos
+
+Each of these test both that the specified variable exists and that its value is not null
+
+Variables are by default strings, therefore setting
+three=1+2 will simply store '1+2' as a string
+
+For you to do arithmetic you need to encompass the equation in (())
+Therefore three=((2 + 1)) will correctly store it as the value as '3' however
+It will still be a string
+
++: addition
+-: subtraction
+*: multiplication
+/: division
+%: modulus 
+++: increment
+--: decrement
+
+When assigning values we can also use the shorthands
+
++=, -=, *=, /= and %=
+
+For comparing values
+
+==: equality
+!=: inequality
+>: greater than
+<: less than
+>=: greater than or equal
+<=: less than or equal
+
+Assessing logic
+
+&&: logical and
+||: logical or
+!: logical not
+
+Matching patterns
+
+${var#pattern}: seek pattern at the start of car then remove the shortest matching part
+${var##pattern}: seek pattern at the start of var then remove the longest matching part
+${var%pattern}: seek pattern at the end of var then remove the shortest matching part
+${var/pattern/string}: seek first instance of pattern in var then replace it with string
+${var//pattern/string}: seek all instances of pattern in var then replace each with string
+
+Chapter 8: Directing flow
+
+You can have if statements in bash scripts by enclosing the conditional in [[]]
+
+if [[ condition test]]
+then
+	do something
+fi
+
+(fi denotes the end of the if statement)
+
+operators:
+
+=: same
+!=: differs
+>: greater than
+<: less than
+
+If comparing integers we use:
+
+-eq: equality
+-ne: inequality
+-gt: greater than
+-lt: less than
+-ge: greater than or equal
+-le: less than or equal
+
+You can also use else statements as follows
+
+if [[condition]]
+then
+	result
+else
+	other result
+fi
+
+elif is also supported (else if)
+
+There is also the case in statement (the equivalent of a switch block)
+
+case test-variable in
+	pattern-1 ) statement for this switch ;;
+	pattern-2 ) statement for this switch ;;
+	pattern-3 ) statement for this switch ;;
+	* ) default statement ;;
+esac
+
+For running for loops the syntax is
+
+for item in list
+do
+	something
+done
+
+Another way of writing this is
+
+for (( initialize ; conditional ; incrementer ))
+do
+	something 
+done
+
+The select statement allows us to easily generate a menu of options from which the user may select one item
+
+select item in list
+do
+	something
+done
+
+For running a while loop the syntax is
+
+initializer
+while conditional test is true
+do
+	something
+	incrementer
+done
+
+For looping until we have
+
+initializer
+until conditional test becomes true
+do
+	something
+	incrementer
+done
+
+You can also use the break command to break out of any of these
+
+Chapter 9: Employing functions
+
+a bash function must first be defined in a script using this syntax
+
+function name 
+{
+	statements to be executed
+}
+
+or 
+
+name() 
+{
+	statement to be executed
+}
+
+these scripts must be made executable with chamod +x
+
+when running these you must preced them with ./ in the terminal
+
+Scripts can also be executed with the source command followed by the script name
+
+once a script has been executed using the source command any function defined there
+are also stored in the shells memory for the duration of that shell session. Therefore
+they can be called by name from a command prompt at any time until the user ends the shell
+session
+
+declare -F: displays all defined functions within current shell memory
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

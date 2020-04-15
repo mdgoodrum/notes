@@ -1,0 +1,85 @@
+Flexbox is a new layout mode in CSS
+
+By default content flows from top to bottom on the page
+
+Flex will leave this unordered list as a block level container, and will affect the layout of its children. If I wanted the container to be an inline element, but also wanted the contents to be displayed using flexbox, I could change display to inline flex.
+
+ul {
+ display: flex
+}
+
+flex-direction: defaults to row, can set to column
+
+Column-reverse and row-reverse does the same but flips output
+
+You can combine these with media queries as well
+
+Passing values to order determines which order the items will be rendered
+
+Everything starts with default order:0, so setting order:1 to an item
+Will place it at the bottom bellow all the others that are defaulted to 0
+Negative values are also allowed
+
+Justify-content: This property affects the way the children are aligned along the direction the content is flowing
+
+Ex: justify-content: flex-start, default value (can be flex-end or center)
+Setting to space-between, spreads them out, first at top, last at bottom, everything in the middle spaced equally
+
+Setting to space-around: distributes the empty space equally among all other children
+The top and bottom is half the size of the other spaces however
+
+Align-item: defaults to stretch, it can also be flex-start, flex-end, center
+Setting to baseline will align the items to the baseline to the first line of text in the first element
+
+We can also change one child independently by using align-self
+
+----------------------------------------
+
+The most flexible part of flex box is the sizing
+
+There are three properties for this
+
+Flex-grow, flex-shrink, flex-basis
+
+These only apply to children not the container
+
+flex-basis: define the optimal size of a child along the flex direction (if it has enough room), defaults to auto
+
+Usually better to set this instead of setting width or height
+
+Flex-grown/shrink: dictates how the excess/deficit space in a flex box will be used, setting these to numbers will divide whats left accordingly, therefore if you have 3 things in your box and set them to 1, 2, 3 you will have a total of 6, the first one receiving 1/6, the second one 2/6 and the last one 3/3
+
+Flex-shrink: 0 will mean that it will never shrink, which can cause an overflow
+
+There is a shorthand for these three values
+
+Flex: 1 = flex-grow: 1, flex-shrink: 1, flex-basis: 0
+(This is often used, effect is all children the same size and grow to all the space)
+
+Flex: 20px = flex-grow: 1, flex-shrink: 1, flex-basis: 20px
+
+flex: 0 80px = flex-grow: 0, flex-shrink: 1, flex-basis: 80px
+
+flex-wrap: helps prevent content from going off screen
+Use it combined with justify-content and align-content (only for multi line content)
+
+Few examples 
+
+min-height: 100vh (vh = vertical height) this will make it take up all the vertical space
+
+Order: 0 or -1 will change the order of the elements
+Flex-direction can also be used for this
+
+Using flex box and flex wrap we can dynamically change a lot of things without needing media queries
+
+
+
+
+
+
+
+
+
+
+
+

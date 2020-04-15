@@ -1,0 +1,1279 @@
+Biggest advantage of Kotlin is how is its interoperability with Java
+
+Chapter 1: What and Why
+
+(1.1, 1.2)
+
+data class Person(val name: String,                | 'data' class
+	val age: Int? = null) 		           | nullable type (Int?): default value
+       
+fun main(args: Array<String>) {                    | top-level function
+	val persons = listOf(Person("Alice"),      | 
+		Person("Bob", age = 29))           | named argument
+
+	val oldest = persons.maxBy { it.age ?: 0 } | lambda expression, Elvis op
+
+	println("The oldest one is: $oldest)       | string template
+}
+
+// The oldest person is: Person(name=Bob, age=29)  | auto generated toString()
+
+
+Omitting Alices age uses the default value of null, the Elvis operator subs
+Her age for 0 and therefore Bob wins with age 29 > 0
+
+The primary goal of Kotlin is to provide a more concise, more productive, safer
+alternative to Java that’s suitable in all contexts where Java is used today
+
+The most common areas to use Kotlin are these:
+Building server-side code (typically, backends of web applications)
+Building mobile applications that run on Android devices
+
+Just like Java, Kotlin is a statically typed programming language.
+
+On the other hand, in contrast to Java, Kotlin doesn’t require you to specify the type
+of every variable explicitly in your source code. In many cases, the type of a variable can
+automatically be determined from the context, allowing you to omit the type declaration.
+
+
+For ex:
+
+val x = 1;
+
+You’re declaring a variable, and because it’s initialized with an integer value, Kotlin automatically determines that its type is Int.
+
+Kotlin’s supports nullable types, which lets you
+write more reliable programs by detecting possible null pointer exceptions at compile
+time.
+
+Kotlin lets you program in the functional style but doesn’t enforce it.
+
+The Kotlin language, including the compiler, libraries, and all related tooling, is entirely
+open source and free to use for any purpose.
+
+(1.3, 1.4)
+
+Server-side programming is a fairly broad concept. It encompasses all of the following
+types of applications and much more:
+Web applications that return HTML pages to a browser
+Backends of mobile applications that expose a JSON API over HTTP
+Microservices that communicate with other microservices over an RPC protocol
+
+fun renderPersonList(persons: Collection<Person>) =
+	createHTML().table {                              | 1
+		for (person in persons)                   | 2
+			{ tr {                            | 1
+				td { +person.name }       | 1
+				td { +person.age }        | 1
+			}
+		}
+	}
+}
+
+1: functions that map html to tags
+2: a regular Kotlin loop
+
+As you can see, you can easily combine functions that map to HTML tags and regular
+Kotlin language constructs. You no longer need to use a separate template language, with
+a separate syntax to learn, just to use a loop when generating a page of HTML.
+
+
+Another case where you can use Kotlin’s clean, concise DSLs is persistence
+frameworks. For example, the Exposed framework
+4 provides an easy way to read DSL
+for describing the structure of an SQL database and performing queries entirely from
+Kotlin code, with full type checking.
+
+object CountryTable : IdTable() {
+	val name = varchar("name", 250).uniqueIndex()
+	val iso = varchar("iso", 2).uniqueIndex()
+}
+
+1
+
+class Country(id: entityID) : Entity(id)
+	{ var name: String by
+	CountryTable.name var iso: String by
+	CountryTable.iso
+}
+
+2
+
+val russia = Country.find
+	{ CountryTable.iso.eq("ru") }.first()
+
+3
+
+1: Describes a table in the database
+2: Creates a class corresponding to a database entity
+3: You can query this database using pure Kotlin code
+
+Common development tasks, such as adding listeners to controls
+or binding layout elements to fields, can be accomplished with much less code, or
+sometimes with no code at all (the compiler will generate it for you). The Anko library (
+https://github.com/kotlin/anko), also built by the Kotlin team, improves your experience
+even further by adding Kotlin-friendly adapters around many standard Android APIs.
+
+verticalLayout {
+	val name = editText()                            | 1
+	button("Say Hello") {                            | 2 
+		onClick { toast("Hello, ${name.text}!" } | 3
+	}
+}
+
+1: creates a simple text field
+2: when click the button displays the value of the text field
+3: concise API's for attaching a listener and showing a toast
+
+Kotlin strives to remove the
+NullPointerException from your program. Kotlin’s type system tracks values that can
+and can’t be null and forbids operations that can lead to a NullPointerException at
+runtime. The additional cost required for this is minimal: marking a type as nullable takes
+only a single character, a question mark at the end:
+
+val s: String? = null    | 1
+val s2: String = ""      | 2
+
+1: maybe be null
+2: may not be null
+
+
+
+Another type of exception that Kotlin helps avoid is the ClassCastException. It
+happens when you cast an object to a type without first checking that it has the right type. In Java, developers often leave out the check, because the type name must be repeated in
+val s: String? = null
+val s2: String = ""
+the check and in the following cast. In Kotlin, on the other hand, the check and the cast
+are combined into a single operation: once you’ve checked the type, you can refer to
+members of that type without any additional casts. Thus, there’s no reason to skip the
+check, and no chance to make an error. Here’s how this works:
+
+if (value is String)                    | 1
+	println(value.toUpperCase())    | 2
+
+1: check the type
+2: uses the method of the type
+
+
+(1.5 1.6)
+
+
+Kotlin source code is normally stored in files with the extension .kt. The Kotlin compiler
+analyzes the source code and generates .class files, just like the Java compiler does. The
+generated .class files are then packaged and executed using the standard procedure for the
+type of application you’re working on. In the simplest case, you can use the kotlinc
+command to compile your code from the command line and use the java command to
+execute your code:
+
+kotlinc <source file or directory> -include-runtime -d <jar name>
+java -jar <jar name>
+
+
+Chapter 2: Kotlin basics
+
+(2.1 2.2)
+
+smart casts: combine a type check and a cast into one operation
+
+fun main(args: Array<String>)
+	{ println("Hello, world!")
+}
+
+This is hello world in Kotlin
+
+The fun keyword is used to declare a function. Programming in Kotlin is lots of fun, indeed!
+
+The parameter type is written after the parameter name. This applies to variable
+declarations as well, as you’ll see later. 
+
+The function can be declared at the top level of a file; you don’t need to put it in a class. 
+
+Arrays are just classes. Unlike Java, Kotlin doesn’t have a special syntax for declaring
+array types. 
+
+You write println instead of System.out.println. The Kotlin standard library
+provides many wrappers around standard Java library functions, with more concise
+syntax, and println is one of them. 
+
+You can omit the semicolon from the end of a line, just as in many other modern
+languages.
+
+fun max(a: Int, b: Int): Int
+	{ return if (a > b) a else
+	b
+}
+
+
+>>> println(max(1, 2))
+2
+
+
+The function declaration starts with the fun keyword, followed by the function name:
+max, in this case. It’s followed by the parameter list in parentheses. The return type
+comes after the parameter list, separated from it by a colon
+
+In Kotlin, if is an expression, not a statement
+
+val question = "The Ultimate Question of Life, the Universe, and Everything"
+val answer = 42
+
+This example omits the type declarations, but you can also specify the type explicitly
+if you want to:
+
+val answer: Int = 42
+
+
+val answer: Int
+answer = 42
+
+The compiler can’t infer the type if you give no information about the values that can
+be assigned to this variable.
+
+val (from value)—Immutable reference. A variable declared with val can’t be
+reassigned after it’s initialized. It corresponds to a final variable in Java.
+
+var (from variable)—Mutable reference. The value of such a variable can be changed. This declaration corresponds to a regular (non-final) 
+
+fun main(args: Array<String>) {
+	val name = if (args.size > 0) args[0] else "Kotlin"
+	println("Hello, $name!")
+}
+
+String template example, you can escape the $ if you need it to show up
+
+You can also use an expression instead of a variable name by using the ${} notation
+
+/* Java */
+public class Person {
+	private final String name;
+	public Person(String name)
+		{ this.name = name;
+	}
+	public String getName()
+		{ return name;
+	}
+}
+
+/* Kotlin */
+
+class Person(val name: String)
+
+Getters and constructors implicitly initialized
+
+In Kotlin, public is the default visibility, so you can omit it
+
+class Person(
+	val name: String,         | 1
+	var isMarried: Boolean    | 2
+)
+
+1: read only, generates field and a trivial getter
+2: writable property, a field, a getter and a setter
+
+class Rectangle(val height: Int, val width: Int)
+	{ val isSquare: Boolean
+	get() {
+		return height == width
+	}
+}
+
+Example of custom getter
+
+Every Kotlin file can have a
+package statement at the beginning, and all declarations (classes, functions, and
+properties) defined in the file will be placed in that package
+
+Declarations defined in
+other files can be used directly if they’re in the same package; they need to be imported if
+they’re in a different package. As in Java, import statements are placed at the beginning
+of the file and use the import keyword.
+
+Kotlin doesn’t make a distinction between importing classes and methods, and it
+allows you to import any kind of declaration using the import keyword.
+
+In most cases, however, it’s still a good practice to follow Java’s directory layout and
+to organize source files into directories according to the package structure. Sticking to
+that structure is especially important in projects where Kotlin is mixed with Java, because
+doing so lets you migrate the code gradually without introducing any surprises
+
+
+(2.3 2.4)
+
+In this section, we’re going to talk about the when construct. It can be thought of as a
+replacement for the switch construct in Java, but in fact it’s more powerful and is used
+much more often. Along the way, we’ll give you an example of declaring enums in
+Kotlin and discuss the concept of smart casts.
+
+enum class Color {
+	RED, ORANGE, YELLOW, GREEN, BLUE, INDIGO, VIOLET
+}
+
+This is a rare case when a Kotlin declaration uses more keywords than the
+corresponding Java one: enum class versus just enum in Java. In Kotlin, enum is a
+so-called soft keyword: it has a special meaning when it comes before class, but you can
+use it as a regular name in other places. On the other hand, class is still a keyword, and
+you’ll continue to declare variables named clazz or aClass
+
+enum class Color(
+	val r: Int, val g: Int, val b: Int                          | 1
+) {
+	RED(255, 0, 0), ORANGE(255, 165, 0),                        | 2
+	YELLOW(255, 255, 0), GREEN(0, 255, 0), BLUE(0, 0, 255),
+	INDIGO(75, 0, 130), VIOLET(238, 130, 238);                  | 3
+	fun rgb() = (r * 256 + g) * 256 + b                         | 4
+}
+>>> println(Color.BLUE.rgb())
+255
+
+
+1: Declares properties of enum constants
+2: Specifies property values when each constant is created
+3: The semicolon here is required.
+4: Defines a method on the enum class
+
+Note that this example shows the
+only place in the Kotlin syntax where you’re required to use semicolons: if you define
+any methods in the enum class, the semicolon separates the enum constant list from the
+method definitions.
+
+Like if, when is an expression that returns a value, so you can write a function with
+an expression body, returning the when expression directly. When we talked about
+functions at the beginning of the chapter, we promised an example of a multiline function
+with an expression body. Here’s such an example:
+
+fun getMnemonic(color: Color) =           | 1
+	when (color) {                    | 2
+		Color.RED -> "Richard"
+		Color.ORANGE -> "Of"
+		Color.YELLOW -> "York"
+		Color.GREEN -> "Gave"
+		Color.BLUE -> "Battle"
+		Color.INDIGO -> "In"
+		Color.VIOLET -> "Vain"
+	}
+>>> println(getMnemonic(Color.BLUE))
+Battle
+
+1: Returns a when expression directly
+2: Returns the corresponding string if the color equals the enum constant
+
+The code finds the branch corresponding to the passed color value. Unlike in Java, you don’t need to write break statements in each branch (a missing break is often a
+cause for bugs in Java code). If a match is successful, only the corresponding branch is
+executed. You can also combine multiple values in the same branch if you separate them with
+commas:
+
+fun getWarmth(color: Color) = when(color)
+	{ Color.RED, Color.ORANGE, Color.YELLOW ->
+	"warm" Color.GREEN -> "neutral"
+	Color.BLUE, Color.INDIGO, Color.VIOLET -> "cold"
+}
+>>> println(getWarmth(Color.ORANGE))
+warm
+
+The when construct in Kotlin is more powerful than Java’s switch. Unlike switch, which requires you to use constants (enum constants, strings, or number literals) as
+branch conditions, when allows any objects. Let’s write a function that mixes two colors
+if they can be mixed in this small palette. You don’t have lots of options, and you can
+easily enumerate them all:
+
+fun mix(c1: Color, c2: Color) =
+	when (setOf(c1, c2)) {                        | 1
+		setOf(RED, YELLOW) -> ORANGE          | 2
+		setOf(YELLOW, BLUE) -> GREEN
+		setOf(BLUE, VIOLET) -> INDIGO
+	else -> throw Exception("Dirty color")        | 3
+}
+>>> println(mix(BLUE, YELLOW))
+GREEN
+
+1: An argument of the when expression can be any object. It’s checked for equality
+with the branch conditions.
+2: Enumerates pairs of colors that can be mixed
+3: Executed if none of the other branches were matched
+
+When without an argument
+
+fun mixOptimized(c1: Color, c2: Color) =
+	when {
+		(c1 == RED && c2 == YELLOW) ||
+		(c1 == YELLOW && c2 == RED) ->
+		ORANGE
+		(c1 == YELLOW && c2 == BLUE) ||
+		(c1 == BLUE && c2 == YELLOW) ->
+		GREEN
+		(c1 == BLUE && c2 == VIOLET) ||
+		(c1 == VIOLET && c2 == BLUE) ->
+		INDIGO
+		else -> throw Exception("Dirty color")
+	}
+>>> println(mixOptimized(BLUE, YELLOW))
+GREEN
+
+If no argument is supplied for the when expression, the branch condition is any
+boolean expression
+
+To mark that a class implements an interface, you use
+a colon (:) followed by the interface name:
+
+interface Expr
+class Num(val value: Int) : Expr                       | 1
+class Sum(val left: Expr, val right: Expr) : Expr      | 2
+
+1: Simple value object class with one property, value, implementing the Expr
+interface
+2: The argument of a Sum operation can be any Expr: either Num or another Sum
+
+In Kotlin, you check whether a variable is of a certain type by using an is check. If
+you’ve programmed in C#, this notation should be familiar. The is check is similar to
+instanceof in Java
+
+Both if and when can have blocks as branches. In this case, the last expression in the
+block is the result. If you want to add some logging to the example function, you can do
+so in the block and return the last value as before:
+
+fun evalWithLogging(e: Expr): Int =
+	when (e) {
+		is Num -> {
+			println("num: ${e.value}")
+			e.value
+		}
+		is Sum -> {
+			val left = evalWithLogging(e.left)
+			val right = evalWithLogging(e.right)
+			println("sum: $left + $right")
+			left + right
+		}
+		else -> throw IllegalArgumentException("Unknown expression")
+	}
+
+
+To replace the most common use cases of for loops, Kotlin
+uses the concepts of ranges.
+
+for (i in 1..100) {
+ // this will happen 100x
+}
+
+for (i in 100 downTo 1 step 2) {
+ // this allows you to go down, step determines how much you subtract each time
+}
+
+The .. syntax also works for characters and not only numbers
+
+For ex: i in "A" .. "F"
+
+You use the in operator to check whether a value is in a range, or its opposite, !in, to
+check if a value isn’t in a range. Here’s how you can use
+belongs to a range of characters:
+
+fun isLetter(c: Char) = c in 'a'..'z' || c in 'A'..'Z'
+
+fun isNotDigit(c: Char) = c !in '0'..'9'
+>>> println(isLetter('q'))
+true
+>>> println(isNotDigit('x'))
+true
+
+Ranges aren’t restricted to characters, either. If you have any class that supports
+comparing instances (by implementing the java.lang.Comparable interface), you can
+create ranges of objects of that type.
+
+(2.5)
+
+Exceptions in Kotlin
+
+if (percentage !in 0..100) {
+	throw IllegalArgumentException(
+		"A percentage value must be between 0 and 100: $percentage")
+}
+
+As with all other classes, you don’t have to use the new keyword to create an instance
+of the exception
+
+Unlike in Java, in Kotlin the throw construct is an expression and can be used as a
+part of other expressions
+
+val percentage =
+	if (number in 0..100)
+		number
+	else
+		throw IllegalArgumentException(
+			"A percentage value must be between 0 and 100: $number")
+
+Just as in Java, you use the try construct with catch and finally clauses to handle
+exceptions
+
+fun readNumber(reader: BufferedReader): Int?              | 1
+	{ try {
+		val line = reader.readLine()
+		return Integer.parseInt(line)
+	}
+	catch (e: NumberFormatException).                 | 2
+		{ return null
+	}
+	finally {                                         | 3
+		reader.close()
+	}
+}
+>>> val reader = BufferedReader(StringReader("239"))
+>>> println(readNumber(reader))
+239
+
+
+1: You don’t have to explicitly specify exceptions that can be thrown from this
+function
+2: The exception type is on the right
+3: finally works just as it does in Java.
+
+The biggest difference from Java is that the throws clause isn’t present in the code: if
+you wrote this function in Java, you’d explicitly write throws IOException after the
+function declaration.
+
+Just like many other modern JVM languages, Kotlin doesn’t differentiate between
+checked and unchecked exceptions.
+
+fun readNumber(reader: BufferedReader)
+	{ val number = try {
+		Integer.parseInt(reader.readLine())               | 1
+	} catch (e: NumberFormatException)
+		{ return
+	}
+	println(number)
+}
+>>> val reader = BufferedReader(StringReader("not a number"))
+
+>>> readNumber(reader)                                            | 2
+
+1: Becomes the value of the try expression
+2: Nothing is printed
+
+Chapter 3: Defining and calling functions
+
+(3.1 3.2)
+
+
+Creating a set
+
+val set = setOf(1, 7, 53)
+
+You create a list or a map in a similar way
+
+val list = listOf(1, 7, 53)
+val map = mapOf(1 to "one", 7 to "seven", 53 to "fifty-three")
+
+Note that to is not a special construct, but a normal function. 
+We’ll return to it later in the chapter
+
+>>> println(set.javaClass)
+class java.util.HashSet
+>>> println(list.javaClass)
+class java.util.ArrayList
+>>> println(map.javaClass)
+class java.util.HashMap
+
+javaClass is Kotlin’s equivalent of Java’s getClass().
+
+Kotlin doesn’t have its own set of collection classes. All of your
+existing knowledge about Java collections still applies here. Why are there no Kotlin collections? Because using the standard Java collections
+makes it much easier to interact with Java code. You don’t need to convert collections
+one way or the other when you call Java functions from Kotlin or vice versa.
+
+Even though Kotlin’s collections are exactly the same classes as Java collections, you
+can do much more with them in Kotlin. For example, you can get the last element in a list
+or find a maximum in a collection of numbers:
+
+>>> val strings = listOf("first", "second", "fourteenth")
+>>> println(strings.last())
+fourteenth
+>>> val numbers = setOf(1, 14, 2)
+>>> println(numbers.max())
+14
+
+>>> val list = listOf(1, 2, 3)
+>>> println(list)                 | 1
+[1, 2, 3]
+
+1: invokes toString()
+
+fun <T> joinToString(
+	collection: Collection<T>,
+	separator: String,
+	prefix: String,
+	postfix: String
+): String {
+	val result = StringBuilder(prefix)
+	for ((index, element) in collection.withIndex()) {
+		if (index > 0) result.append(separator)         | 1
+		result.append(element)
+	}
+	result.append(postfix)
+	return result.toString()
+}
+
+
+1: Don’t append a separator before the first element.
+
+joinToString(collection, " ", " ", ".")
+
+Not very readable
+
+joinToString(collection, separator = " ", prefix = " ", postfix = ".")
+
+Much better
+
+When calling a method written in Kotlin, you can specify the names of some
+arguments that you’re passing to the function. If you specify the name of an argument in
+a call, you should also specify the names for all the arguments after that, to avoid
+confusion
+
+Warning
+Unfortunately you can’t use named arguments when calling methods
+written in Java,
+
+In Kotlin, you can often avoid creating overloads because you can specify default
+values for parameters in a function declaration. Let’s use that to improve the
+joinToString function. For most cases, the strings can be separated by commas without
+any prefix or postfix. So, let’s make these values the defaults:
+
+fun <T> joinToString(
+	collection: Collection<T>,
+	separator: String = ", ",
+	prefix: String = "",
+	postfix: String = ""
+): String
+
+Now you can either invoke the function with all the arguments or omit some of them
+
+>>> joinToString(list, ", ", "", "")
+1, 2, 3
+>>> joinToString(list)
+1, 2, 3
+>>> joinToString(list, "; ")
+1; 2; 3
+
+When using the regular call syntax, you can omit only trailing arguments. If you use
+named arguments, you can omit some arguments from the middle of the list and specify
+only the ones you need:
+
+>>> joinToString(list, prefix = "# ")
+# 1, 2, 3
+
+We all know that Java, as an object-oriented language, requires code to be written as
+methods of classes
+
+As a result, you end up with classes that don’t contain any state or any instance
+methods and that act as containers for a bunch of static methods
+
+In Kotlin, you don’t need to create all those meaningless classes. Instead, you can
+place functions directly at the top level of a source file, outside of any class
+
+Let’s put the joinToString function into the strings package directly. Create a file
+called join.kt with the following contents:
+
+package strings
+fun joinToString(...): String { ... }
+
+let’s look at the Java
+code that would compile to the same class:
+
+/* Java */
+package strings;
+public class JoinKt {
+	public static String joinToString(...) { ... }
+}
+
+
+You can see that the name of the class generated by the Kotlin compiler corresponds
+to the name of the file containing the function. All top-level functions in the file are
+compiled to static methods of that class. Therefore, calling this method from Java is as
+easy as calling any other static method:
+
+/* Java */
+import strings.JoinKt;
+...
+JoinKt.joinToString(list, ", ", "", "");
+
+To change the name of the generated class that contains Kotlin top-level
+functions, you add a @JvmName annotation to the file. Place it at the
+beginning of the file, before the package name:
+
+@file:JvmName("StringFunctions")
+package strings
+fun joinToString(...): String { ... }
+
+Now the function can be called as follows:
+
+/* Java */
+import strings.StringFunctions;
+StringFunctions.joinToString(list, ", ", "", "");
+
+By default, top-level properties, just like any other properties, are exposed to Java
+code as accessor methods (a getter for a val property and a getter/setter pair for a var
+property). If you want to expose a constant to Java code as a public static final
+field, to make its usage more natural, you can mark it with the const modifier (this is
+allowed for properties of primitive types, as well as String):
+
+const val UNIX_LINE_SEPARATOR = "\n"
+
+This gets you the equivalent of the following Java code:
+
+/* Java */
+public static final String UNIX_LINE_SEPARATOR = "\n";
+
+(3.3 3.4)
+
+Conceptually, an extension function is a simple thing: it’s a function that can be called
+as a member of a class but is defined outside of it
+
+To demonstrate that, let’s add a
+method for computing the last character of a string
+
+
+
+package strings
+
+fun String.lastChar(): Char = this.get(this.length - 1)
+
+
+As you can see, all you need to do is put the name of the class or interface that you’re
+extending before the name of the function you’re adding. This class name is called the
+receiver type, and the value on which you’re calling the extension function is called the
+receiver object
+
+In this case String is the receiver type and 'this' is referencing the receiver object
+
+You can call the function using the same syntax you use for ordinary class members
+
+>>> println("Kotlin".lastChar())
+n
+
+In a sense, you’ve added your own method to the String class. Even though String
+isn’t part of your code
+
+In the body of an extension function, you use this as you’d use it in a method. And, as in a regular method, you can omit it:
+
+package strings
+
+fun String.lastChar(): Char = get(length - 1)
+
+Using implicit 'this'
+
+Unlike methods defined in the class, extension functions don’t have access to private or protected members of the class.
+
+When you define an extension function, it doesn’t automatically become available across
+your entire project. Instead, it needs to be imported, just like any other class or function. This helps avoid accidental name conflicts
+
+import strings.lastChar
+val c = "Kotlin".lastChar()
+
+You can change the name of the class or function you’re importing using the as
+keyword
+
+import strings.lastChar as last
+val c = "Kotlin".last()
+
+Method overriding in Kotlin works as usual for member functions, but you can’t override
+an extension function.
+
+In the previous section, you defined a function lastChar. Now let’s convert it into a
+property
+
+val String.lastChar: Char
+	get() = get(length - 1)
+
+
+when you need to access an extension property from Java, you should
+invoke its getter explicitly: StringUtilKt.getLastChar("Java")
+
+
+The vararg keyword, allows you to declare a function taking an arbitrary number
+of arguments
+
+An infix notation lets you call some one-argument functions without ceremony
+
+Destructuring declarations allow you to unpack a single composite value into
+multiple variables
+
+When you call a function to create a list, you can pass any number of arguments to it:
+
+val list = listOf(2, 3, 5, 7, 11)
+
+If you look up how this function is declared in the library, you’ll find the following:
+
+fun listOf<T>(vararg values: T): List<T> { ... }
+
+One other difference between Kotlin and Java is the syntax of calling the function
+when the arguments you need to pass are already packed in an array. In Java, you pass
+the array as is, whereas Kotlin requires you to explicitly unpack the array. Technically, this feature is called using a spread operator, but in practice it’s as simple as putting the * character before the corresponding argument:
+
+fun main(args: Array<String>) {
+	val list = listOf("args: ", *args)
+	println(list)
+}
+
+To create maps, you use the mapOf() function:
+
+val map = mapOf(1 to "one", 7 to "seven", 53 to "fifty-three")
+
+This is a good time to provide another explanation we promised you at the beginning
+of the chapter. The word to in this line of code isn’t a built-in construct, but rather a
+method invocation of a special kind, called an infix call
+
+In an infix call, the method name is placed immediately between the target object
+name and the parameter, with no extra separators. The following two calls are equivalent:
+
+1.to("one")
+1 to "one"
+
+Infix calls can be used with regular methods and extension functions that have one
+required parameter.
+
+
+(3.5 3.6)
+
+"The split() method in Java
+doesn’t work on a dot." It’s a common trap to write "12.345-6.A".split(".") and to
+expect an array [12, 345-6, A] as a result. But Java’s split method returns an empty
+array! That happens because it takes a regular expression as a parameter, and it splits a
+string into several strings according to the expression.
+
+
+Kotlin hides the confusing method and provides as replacements several overloaded extensions named split that have different arguments
+
+Here’s how you’d split the string by either a dot or a dash:
+
+>>> println("12.345-6.A".split("\\.|-".toRegex()))
+[12, 345, 6, A]
+
+This creates a regular expression explicitly
+
+
+
+>>> println("12.345-6.A".split(".", "-"))
+[12, 345, 6, A]
+
+This specifies several delimiters without using a regex
+
+fun parsePath(path: String) {
+	val directory = path.substringBeforeLast("/")
+	val fullName = path.substringAfterLast("/")
+	val fileName = fullName.substringBeforeLast(".")
+	val extension = fullName.substringAfterLast(".")
+	println("Dir: $directory, name: $fileName, ext: $extension")
+}
+>>> parsePath("/Users/yole/kotlin-book/chapter.adoc")
+Dir: /Users/yole/kotlin-book, name: chapter, ext: adoc
+
+Here’s how the same task can be done using regular expressions:
+
+fun parsePathRegexp(path: String) {
+	val regex = """(.+)/(.+)\.(.+)""".toRegex()
+	val matchResult = regex.matchEntire(path)
+	if (matchResult != null) {
+		val (directory, filename, extension) = matchResult.destructured
+		println("Dir: $directory, name: $filename, ext: $extension")
+	}
+}
+
+In this example, the regular expression is written in a triple-quoted string. In such a
+string, you don’t need to escape any characters, including the backslash
+
+The purpose of triple-quoted strings is not only to avoid escaping characters. Such a
+string literal can contain any characters, including line breaks. That gives you an easy
+way to embed in your programs text containing line breaks. As an example, let’s draw
+some ASCII art:
+
+val kotlinLogo = """| //
+		   .|//
+		   .|/ \"""
+>>> println(kotlinLogo.trimMargin("."))
+| //
+|//
+|/ \
+
+Let’s see how to use local functions to fix a fairly common case of code duplication.
+
+class User(val id: Int, val name: String, val address: String)
+	fun saveUser(user: User) {
+	if (user.name.isEmpty()) {
+		throw IllegalArgumentException(
+			"Cannot save user ${user.id}: Name is empty")
+	}
+	if (user.address.isEmpty()) { 
+		throw IllegalArgumentException(
+			"Cannot save user ${user.id}: Address is empty")
+	}
+	// Save user to the database
+}
+>>> saveUser(User(1, "", ""))
+java.lang.IllegalArgumentException: Cannot save user 
+
+The amount of duplicated code here is fairly small, and you probably won’t want to
+have a full-blown method in your class that handles one special case of validating a user. But if you put the validation code into a local function, you can get rid of the duplication
+and still maintain a clear code structure. Here’s how it works:
+
+class User(val id: Int, val name: String, val address: String)
+
+fun saveUser(user: User) {
+	fun validate(user: User,
+			value: String,
+			fieldName: String) {
+		if (value.isEmpty()) {
+			throw IllegalArgumentException(
+			"Cannot save user ${user.id}: $fieldName is empty")
+		}
+	}
+	validate(user, user.name, "Name")
+	validate(user, user.address, "Address")
+	// Save user to the database
+}
+
+local functions have access to all parameters and
+variables of the enclosing function.
+
+Therefore we can do this:
+
+fun saveUser(user: User) {
+	fun validate(value: String, fieldName: String) {
+		if (value.isEmpty()) {
+			throw IllegalArgumentException(
+			"Cannot save user ${user.id}: $fieldName is empty")
+		}
+	}
+	validate(user.name, "Name")
+	validate(user.address, "Address")
+	// Save user to the database
+}
+
+To improve this example even further, you can move the validation logic into an
+extension function of the User class:
+
+class User(val id: Int, val name: String, val address: String)
+
+fun User.validateBeforeSave() {
+	fun validate(value: String, fieldName: String)
+		{ if (value.isEmpty()) {
+			throw IllegalArgumentException(
+				"Can't save user $id: empty $fieldName")
+		}
+	}
+	validate(name, "Name")
+	validate(address, "Address")
+}
+
+fun saveUser(user: User)
+	{ user.validateBeforeSave
+	()
+	// Save user to the database
+}
+
+
+Extracting a piece of code into an extension function turns out to be surprisingly
+useful. Even though User is a part of your codebase and not a library class, you don’t
+want to put this logic into a method of User because it’s not relevant to any other places
+where User is used.
+
+
+
+Chapter 4: Classes, Objects, and Interfaces
+
+(4.1 4.2)
+
+Declaring a
+class as a data class instructs the compiler to generate several standard methods for this
+class.
+
+object keyword that declares a class and also
+creates an instance of the class.
+
+The keyword is used to express singleton objects, companion objects, and object expressions
+
+We’ll begin with a look at defining and implementing interfaces. Kotlin interfaces are
+similar to those of Java 8: they can contain definitions of abstract methods as well as
+implementations of non-abstract methods (similar to the Java 8 default methods), but
+they can’t contain any state
+
+To declare an interface in Kotlin, use the interface keyword instead of class:
+
+interface Clickable
+	{ fun click()
+}
+
+Here’s how you implement the interface:
+
+class Button : Clickable {
+	override fun click() = println("I was clicked")
+}
+
+Kotlin uses the colon after the class name to replace both the
+implements keywords used in Java
+
+The override modifier, similar to the @Override annotation in Java, is used to mark
+methods and properties that override those from the superclass or interface. Unlike Java, using the override modifier is mandatory in Kotlin. This saves you from accidentally
+overriding a method if it’s added after you wrote your implementation; your code won’t
+compile unless you explicitly mark the method as override or rename it.
+
+Let’s change the
+Clickable interface by adding a method with a default implementation
+
+interface Clickable {
+	fun click()
+	fun showOff() = println("I'm clickable!")
+}
+
+Let’s suppose now that another interface also defines a showOff method and has the
+following implementation for it:
+
+interface Focusable {
+	fun setFocus(b: Boolean) =
+		println("I ${if (b) "got" else "lost"} focus.")
+	fun showOff() = println("I'm focusable!")
+}
+
+What happens if you need to implement both interfaces in your class? Each of them
+contains a showOff method with a default implementation; which implementation wins?
+Neither one wins. Instead, you get the following compiler error if you don’t implement
+showOff explicitly:
+
+The class Button must override public open fun showOff() because it
+inherits many implementations of it
+
+The Kotlin compiler forces you to provide your own implementation:
+
+class Button : Clickable, Focusable {
+	override fun click() = println("I was clicked")
+
+	override fun showOff() {
+		super<Clickable>.showOff()
+		super<Focusable>.showOff()
+	}
+}
+
+Whereas Java’s classes and methods are open by
+default, Kotlin’s are final by default.
+
+If you want to allow the creation of subclasses of a class, you need to mark the class
+with the open modifier. In addition, you need to add the open modifier to every property
+or method that can be overridden
+
+open class RichButton : Clickable {
+	fun disable() {}
+	open fun animate() {}
+	override fun click() {}
+}
+
+Note that if you override a member of a base class or interface, the overriding
+member will also be open by default. If you want to change this and forbid the subclasses
+of your class from overriding your implementation, you can explicitly mark the
+overriding member as final:
+
+open class RichButton : Clickable
+	{ final override fun click() {}
+}
+
+"final" isn’t redundant here because "override" without "final" implies being
+"open"
+
+First we’ll look at the syntax
+of declaring the primary constructor and initializer blocks, and then we’ll explain how to
+declare several constructors
+
+a simple class:
+
+class User(val nickname: String)
+
+Normally, all the declarations in a class go inside curly braces. You may wonder why
+this class has no curly braces and instead has only a declaration in parentheses. This
+block of code surrounded by parentheses is called a primary constructor. It serves two
+purposes: specifying constructor parameters and defining properties that are initialized by
+those parameters
+
+
+This is equivalent	
+
+class User constructor(_nickname: String)
+	{ val nickname: String
+	
+	init {
+		nickname = _nickname
+	}
+}
+
+In this example, you see two new Kotlin keywords: constructor and init. The
+constructor keyword begins the declaration of a primary or secondary constructor. The
+init keyword introduces an initializer block
+
+The underscore in the constructor parameter _nickname serves to distinguish the
+name of the property from the name of the constructor parameter.
+
+You can declare default values for constructor arguments just as you can for function
+arguments
+
+
+class User(val nickname: String,
+	val isSubscribed: Boolean = true)
+
+To create an instance of a class, you call the constructor directly, without the new
+keyword:
+
+>>> val alice = User("Alice")
+>>> println(alice.isSubscribed)
+true
+>>> val bob = User("Bob", isSubscribed = false)
+>>> println(bob.isSubscribed)
+false
+
+If all the constructor parameters have default values, the compiler
+generates an additional constructor without parameters that uses
+all the default values. That makes it easier to use Kotlin with
+libraries that instantiate classes via parameterless constructors.
+
+If your class has a superclass, the primary constructor also needs to initialize the
+superclass. You can do so by providing the superclass constructor parameters after the
+superclass reference in the base class list:
+
+open class User(val nickname: String) { ... }
+class TwitterUser(nickname: String) : User(nickname) { ... }
+
+If you don’t declare any constructors for a class, a default constructor that does
+nothing will be generated for you:
+
+open class Button
+
+If you inherit the Button class and don’t provide any constructors, you have to
+explicitly invoke the constructor of the superclass even if it doesn’t have any parameters:
+
+class RadioButton: Button()
+
+If you want to ensure that your class can’t be instantiated by other code, you have to
+make the constructor private
+
+class Secretive private constructor() {}
+
+Alternatively, you can declare it in a more usual way in the body of the class:
+
+class Secretive {
+	private constructor()
+}
+
+
+
+
+open class View
+	{ constructor(ctx: Context)
+	{
+		// some code
+	}
+	constructor(ctx: Context, attr: AttributeSet) {
+	// some code
+	}
+}
+
+This class doesn’t declare a primary constructor (as you can tell because there are no
+parentheses after the class name in the class header), but it declares two secondary
+constructors. A secondary constructor is introduced using the
+You can declare as many secondary constructors as you need. constructor keyword.
+
+If you want to extend this class, you can declare the same constructors:
+
+class MyButton : View
+	{ constructor(ctx:
+	Context)
+		: super(ctx) {
+		// ...
+	}
+	constructor(ctx: Context, attr: AttributeSet)
+		: super(ctx, attr) {
+	// ...
+	}
+}
+
+Here you define two constructors, each of which calls the corresponding constructor
+of the superclass using the super() keyword.
+
+Just as in Java, you also have an option to call another constructor of your own class
+from a constructor, using the this() keyword
+
+class MyButton : View {
+	constructor(ctx: Context): this(ctx, MY_STYLE) {
+		// ...
+	}
+	constructor(ctx: Context, attr: AttributeSet): super(ctx, attr) {
+		// ...
+	}
+}
+
+In Kotlin, an interface can contain abstract property declarations.
+
+interface User {
+	val nickname: String
+}
+
+
+
+class PrivateUser(override val nickname: String) : User
+
+class SubscribingUser(val email: String) : User {
+	override val nickname: String
+	get() = email.substringBefore('@')
+}
+
+class FacebookUser(val accountId: Int) : User
+	{ override val nickname =
+	getFacebookName(accountId)
+}
+
+>>> println(PrivateUser("test@kotlinlang.org").nickname)
+test@kotlinlang.org
+>>> println(SubscribingUser("test@kotlinlang.org").nickname)
+test
+
+You’ve seen a few examples of two kinds of properties: properties that store values and
+properties with custom accessors that calculate values on every access. Now let’s see
+how you can combine the two and implement a property that stores a value and provides
+additional logic that’s executed when the value is accessed or modified.
+
+class User(val name: String) {
+	var address: String = "unspecified"
+	set(value: String) {
+		println("""
+			Address was changed for $name:
+			"$field" -> "$value".""".trimIndent())
+		field = value
+	}
+}
+>>> val user = User("Alice")
+>>> user.address = "Elsenheimerstraße 47, 80687 München"
+Address was changed for Alice:
+"unspecified" -> "Elsenheimerstraße 47, 80687 München".
+
+class LengthCounter
+	{ var counter: Int =
+	0
+		private set
+	fun addWord(word: String)
+		{ counter +=
+
+	}
+}
+
+You can’t change set outside of the class.
+
+(4.3 4.4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

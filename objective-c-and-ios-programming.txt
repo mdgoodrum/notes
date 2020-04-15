@@ -1,0 +1,501 @@
+Chapter 1: Launching and getting started
+
+Objective-C is an object-oriented programming language that runs at very fast speeds while employing
+dynamic runtime. In essence, objective-c is C + object-oriented programming.
+
+Any C code will work in an Objective-c program and gets compiled into objective-c.
+
+Methods in Objective-c are sent rather then called or invoked.
+
+@implementation: file that holds the method implementations, has suffix of .m
+@interface: file that holds the instance variables, properties and method declarations, has a suffix of .h
+
+You can register as an Apple developer or iOS developer.
+
+Registering as an apple developer is the simplest option. It is free and you just need to have an 
+apple id. Registering as an apple developer will give you access to developer resources and allows you 
+to download Xcode.
+
+Registering as an iOS developer permits you to tests the apps on devices and sell the apps on the app store
+
+Xcode: integrated development environment in which you create applications for iOS. It is integrated with 
+Cocoa Touch, which makes it easy to develop animation, networking, and other powerful touch features.
+
+iOS SDK: includes Xcode, the compiler for Objective-C, a debugger, an interface builder and the iOS simulator.
+
+Downloading Xcode actually downloads the entire iOS SDK.
+
+Creating our first project:
+
+Open up Xcode and click 'Create a new Xcode project'
+
+This will take you to a template to be chosen depending on what type of project you will be creating
+
+For the purpose of this demo we will be choosing macOS Command line tool
+
+put the name of your project and select Objective-C as the language
+
+On the left side you will see the file structure of our project with a main.m file available
+
+inside this file you will see @autoreleasepool which handles memory management
+
+make some changes to our function and click play, if you have no compile errors the result will be displayed
+
+Xcode automatically saves your code when you run it
+
+Xcode has a built-in debugger that lets you walk through a program's code. You can activate it by clicking
+on any line of code to add a break point. Next time your program will run it will stop at this break point and you
+will have the option to step into, step over or step out of the code or continue its execution.
+
+Chapter 2: Data types and arithmetic expressions
+
+variable: holds data that changes as the program runs
+constant: holds data that have a fixed value
+
+we have two print methods in objective-c, the first is printf() which is the printing 
+function from C (remember that C code works inside objective-c). The second is the objective-c
+specific print function called NSLog(). NSLog allows us to format the output.
+
+int: %d, %i, %x
+char: %c
+float: %f
+double: %f
+newline: \n
+literally print symbol %: %%
+pointer: %p
+
+scanf: uses the format specifiers in the same manner as NSLog and reads user typed input
+however since float and doubles have the same specifier, we use %lf for doubles
+the first value in the call determines which type you expect and the second will be &variableName
+
+therefore 
+
+scanf("%d", &num); will store an integer in the num variable
+
+Basic data types
+
+int: stores a whole number without a decimal place 16 bits
+char: stores a single character (value is between single quotes) 8 bits
+float: floating point value, 32 bits
+double: same as float but twice the size, 64 bits
+
+Derived data types (combinations of basic data types)
+
+pointer: points to the location where data is stored (pointers have * before the name declaration)
+
+putting a & before a variable will return its address location, usually used for pointers
+
+int value = 5;
+int *ptrValue;
+ptrValue = &value;
+
+putting a * before a pointer dereferences it causing it to return the contents of where its pointed
+
+struct: combination of several data types that creates a new custom data type
+
+the struct is a static version of a class
+
+enum: defines a new data type with enumerations
+
+typedef enum {
+	jan = 1;
+	feb = 2;
+	march = 3;
+	april = 4;
+	may = 5;
+} Month;
+
+if values are not passed the first is assigned 0 and increments from there
+
+#define: defines constants and associates them with a unique name
+
+ex: #define PERC_PASSED 95.0
+
+Arithmetic expressions: +, -, *, / and %
+
+compound assignment operators: =, ++, --, +=, -=, *=, /=, %=
+
+Chapter 3: Decisions and conditions
+
+relational operators:
+
+>, <, >=, <=, ==, !=
+
+logical operators: 
+
+&&, ||, !
+
+switch statement
+
+switch(expression)
+{
+	case value1:
+		something
+	break;
+	case value2:
+		something else
+	break;
+	default:
+		something
+}
+
+Chapter 4: Looping
+
+counter controlled for loop
+
+for (int i = 0; i < something; i++) {
+	
+}
+
+you can insert a break statement to break out of the loop
+
+you can also insert a continue statement to jump to the next value of the counter
+
+condition controlled loop
+
+while (something) {
+	
+}
+
+Chapter 5: Functions
+
+A function consists of a declaration and a body. The declaration consists of three main parts
+1: return type
+2: the function name
+3: parameters list in parentheses
+
+int main (int argc, const char * argv[]) {
+	do some stuff
+}
+
+prototype declaration: this is done when you write functions bellow your main function
+
+ex:
+
+void welcome();
+int main (int argc, const char * argv[]) {
+	@autoreleasepool {
+		welcome();
+	}
+}
+void welcome() {
+	NSLog(@"\nGood Evening, how are you doing tonight?");
+}
+
+note: Objective C does not support function overloading
+
+return type is the type of data the function will return when executed.
+this type can be basic data types or derived data types
+
+Chapter 6: Foundation framework
+
+Objective C is a superset of the Ansi C language, which is a procedural language.
+
+In Objective C an objects method cannot be invoked by calling it. Instead, an object must
+pass a message to its method to invoke it. 
+
+The syntax for passing a message to a method is:
+
+[Object/receiver method/message]
+
+usually if you have an object with a method we would use the dot notation
+
+therefore an object carlled yorkie with a method called run would be invoked as
+
+yorkie.run();
+
+in objective c this would look like
+
+[yorkie run];
+
+if you need to pass a value to run it would look like
+
+[yorkie run:length];
+
+you can also pass it a fixed value like
+
+[yorkie run:12];
+
+In message nesting, one message can be sent to another message as follows
+
+[information getInfo:[name getName]];
+
+in this case the returned value for [name getName] is passed as the parameter
+to getInfo
+
+The foundation framework, forms the infrastructure of the objective c language.
+
+The framework includes a root object class called NSObject, which provides some basic utility
+classes such as NSString, NSMutableString, NSArray, NSMutableArray, NSDictionary, NSMutableDictionary,
+NSDate, NSError, NSNetService, NSURL, NSNotification, and NSData.
+
+When you choose to implement the foundation fraemwork functionality, you must inclide the statement
+
+#import <Foundation/Foundation.h>
+
+One important memory management mechanism is Autoreleasepool.
+In objective C, automatic reference counting (ARC) allows the compiler to use
+the @autoreleasepool to control the rservation and release of the memory for any object.
+
+@Autoreleasepool implementation is required for the use of the classes in the Foundation framework.
+
+NSString: a string object is enclosed in double quptation marks and preceded by the @ symbol.
+
+@"This is a string"
+
+strings are immutable by default, NSMutabelString, a subclass of NSString supports the implementation
+of a mutable string
+
+NSString contains a length mehtod and a characterAtIndex method
+
+it also contains a substringFromIndex and lowercaseSTring method
+
+NSArray: traditional array data structure
+
+NSMutableArray: mutable version of NSArray
+
+most common methods are objectAtIndex and count (number of elements)
+
+example with arrays
+
+#import <Foundation/Foundation.h>
+
+int main(int argc, const char * argv[])
+{
+	@autoreleasepool {
+		// Create a variable to store the length of the array
+		int myArrayNamesLength;
+		// Create an array using arrayWithObjects methid
+		NSArray *myArrayNames = [NSArray arrayWithObjects:@"Chocolate", @"Vanilla", @"Raspberry", @"Blueberry", null];
+		// Find the length of the array and print it
+		myArrayNamesLength = [myArrayNames count];
+		NSLog(@"\nmyArrayNames has %i elements", myArrayNamesLength);
+		// Print the contents of the array
+		for (int i = 0; i < myArrayNamesLength; i++) {
+			NSLog(@"\nThe element at index %i is %a", i, [myARrayNames objectAtIndex:i]);
+		}
+	}
+	return 0;
+}
+
+sortedArrayUsingSelector uses a comparator to sort the array in ascending order
+
+NSDate: abstract class that helps create, compare and calculate time intervals
+
+NSDictionary: supports data set that includes key-value pairs
+
+NSMutableDictionary: mutable version of NSDictionary
+
+Chapter 7: OO Programming
+
+encapsulation: process of combining data elements, as well as set functions that are operational
+on these data elements
+
+object: instance of a class
+
+class: creates a description of the data and the operations on this data for the object
+
+an object is something you can visualize (something concrete), whereas a class is an abstract concept
+
+a class consists of data members and a set of operations/functions
+
+constructors: special types of methods that facilitate the creation of objects
+
+method: function in a class
+
+there are two main types of methods in an objective c class, class methods and instance methods
+
+instance methods: methods that can only be invoked after the instantiation of a class
+
+class methods: methods that can be executed irrespective of the instantiation of the class
+
+instance methods are identified by a - and class methods are identified by a +
+
+method declaration format:
+
++(returnType) methodNamePart1:(datatype)parameter1 namePart2:(datatype)parameter2
+
+method type, method name, parameter data type, parameter name, method name, second parameter
+
+When creating a class the instance variables and the method declarations are found in the
+@interface file which is also known as the header file and has a .h extension
+
+syntax as follows:
+
+@interface myClass: parentClass
+{
+	instance variables also called data members
+}
+method declarations
+@end
+
+note: in objective c a variable and a method can have the same name
+
+inside the curly braces the instance variables are declared the same way any other variables are declared.
+After the instance variables are the method declarations, which contain only the headers.
+
+Implementation of these is in @implemention, syntax as follows:
+
+@implementation myClass: parentClass
+	Methods
+@end
+
+to create these files we will create a new file in xcode and select cocoa touch class under ios
+
+in our .h file instance variables are declared inside the curly brackets, whereas the methods are delcared
+outside the curly brackets
+
+The creation of an object is a two-step process
+
+1. Allocate memory for the object
+2. Initialize the instance variables of the object
+
+aClass *object = [[Aclass alloc] init];
+
+Objective-C classes ultimately inherit form the NSOjbect and hence have some common methods that can be used by all objects
+
+One such method is init
+
+The default init method initalizes the instance variables of a class to nill or zero
+
+You can create custom init methods that override the default init method the syntax is as follows
+
+-(id) init 
+{
+	if (self == [super init])
+	{
+		do the following
+	}
+	return self;
+}
+
+the description method is the equivalent of toString syntax is as follows
+
+-(NSString *) description
+{
+	NSString *objDescription = [NSString stringWithFormat:@"\nBreed: %a \nHeight: %.2f", breed, height, color, weight];
+	return objDescription;
+}
+
+Inheritance: defines an "is a" relationship between two classes
+
+every object in objective c "is a" NSOjbect
+
+Chapter 8: Working in the iOS environment
+
+The four layers of iOS are Cocoa Touch, Media, Core Services, and Core OS
+
+LLVM compiler: offers developers tools used to compile and debug code. Position your mouse
+over a variable and itll show the variables contents as the app is running
+
+Interface Builder: visual development tool that can be used to create the view controller
+the user interacts with. THe view controller does not have direct access to the data elements,
+instead it communicates with the view contorller, which in turn, has access to the data/model
+
+iOS Simulator: used for testing apps, runs a VM of a i device, location, phone capabilities, accelerometer 
+and the camera are unavailable in the simulator
+
+Instruments: is a development tool provided by the iOS SDK for testing the performance of an app
+
+Development Support: https://developer.apple.com/support/ios/
+
+iOS App Life Cycle: When an iOS app starts a UIApplication object is created which then creates a 
+UIWindow  and launches a UIView object wihting the UIWindow object. UIApplication then gets the UIApplicationdelegate
+running which in turn manages the life cycle of the app
+
+Chapter 9: Understanding and creating user interfaces
+
+Storyboarding: feature that allows the developer to work with all the view controllers in an app at one time.
+
+seuges: transitions between views
+
+Chapter 10: passing data between view controllers, delegates and protocols
+
+present: presenting a view controller means making a view controller visible to the user
+
+Dismiss it: closing a view that is no longer needed
+
+No matter how you create an app with multiple view controllers, each view controller has its own
+Set of @interface (.h file) and @implementation (.m file). Whether or not you use storyboards to create the app determines whether the view controller also has a .xib file or a storyboard file.
+
+Phases in a view controller's life cycle
+
+instantiation: view controller is created by another object
+
+lifetime: longest phase, performs tasks
+
+destruction: controller informs its creator that its task is completed, at which point the creating object dismisses the view controller
+
+delegate: object that acts on behalf of another object
+
+Delegating object: object being delegated by the delegator
+
+protocol: method that provides a means for programmatically interfacing a delegate with a delegating object, there are formal and informal protocol types
+
+Formal protocols: used when an object decides to use a delegate to communicate
+
+Informal protocols: usually implemented by a set of objects
+
+The advantage of implementing a delegate is that is hides or encapsulates the details of the code, thereby enabling its use in other parts of the app
+
+Steps for implementing a delegate
+
+1. Declare the delegate
+2. Instantiate the view controller
+3. Lifetime of the view controller
+4. Destruction
+
+Chapter 11: Table views
+
+UITable view: commonly used view in iOS, looks like a list, it is an instance of the UITableView class and a subclass of the UIScrollView. It allows vertical scrolling through a list of items in the table. 
+
+Each row is called a cell and can hold text or an image
+
+There are two styles of tables views, plain and grouped
+
+By default a table view is plain
+
+A table view can be static
+
+The UITableView's implementation requires a view controller, a data source and a delegate that manages the table
+
+When populating a table view from an array, the array should be initialized in the viewDidLoad method
+
+Chapter 12: Tab bar view and picker view controls
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

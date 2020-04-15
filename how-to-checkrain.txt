@@ -1,0 +1,44 @@
+phone / ipads up to the a11 chip will be supported 
+therefore a12 and a13 are not which include 
+
+iphone xs and max
+iphone xr 
+iphone 11
+iphone 11 pro and max
+ipad pro 2018
+ipad mini 5
+ipad air 2019
+
+
+backup your iphone in itunes
+plug in phone
+select sync settings
+select back up all of the data on your iphone to this mac
+select to encrypt
+set a password for the encryption
+wait till backup is complete
+
+download newest version of ios if youre not already on it
+select check for update
+select download only
+select next till the last window then ok
+
+restore iphone
+click restore iphone
+you must have find my iphone off for this to work
+
+if it is on itunes will let you know this setting must be turned off
+open settings in your iphone
+click your name
+click icloud 
+scroll down to find my iphone
+turn it off, this will need your icloud password
+
+after turning find my iphone off go back to sync settings
+restore iphone
+restore and update
+
+it might say that device is not found, ignore and wait for the 
+download to complete, youll see a progress pie in the left side
+
+

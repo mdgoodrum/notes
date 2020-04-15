@@ -1,0 +1,13 @@
+A Docker image is a private filesystem, just for your container. It provides all the files and code your container will need. Running the docker build command creates a Docker image using the Dockerfile. This built image is in your machine's local Docker image registry.
+
+cd doodle/cheers2019 &&
+docker build -t sk8erfrom/cheers2019 .
+
+Running a container launches your software with private resources, securely isolated from the rest of your machine.
+
+docker run -it --rm sk8erfrom/cheers2019
+
+Once you're ready to share your container with the world, push the image that describes it to Docker Hub.
+
+docker login &&
+docker push sk8erfrom/cheers2019

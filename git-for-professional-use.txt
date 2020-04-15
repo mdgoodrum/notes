@@ -1,0 +1,284 @@
+to make a repository from an existing directory run
+
+git init
+
+deleting the .git folder will undo this
+
+you can also create the repo on github, copy the url you usually clone and run
+
+git remote add origin url
+
+from inside the folder you want to link to this repository
+
+-----------------------------------
+
+git status will show the differences between your local and remote branches
+
+git add . is the same as git add -A and stages all the current differences 
+
+git commit -m "commit message" will commit the staged changes
+
+git push will push the commited changes to the remote branch
+
+git pull will pull any changes from the remote to your local branch
+
+git pull = git fetch + git merge
+
+git fetch pulls the remote but doesnt add it to your local yet
+
+git merge merges those changes to your local branch
+
+-----------------------------------
+
+README.md is in markdown format typically
+
+common syntax is # before line for highlighting and 
+``` around snippet for creating a grey box around the snippet
+
+-----------------------------------
+
+git branch new-branch-name creates a new branch
+
+git branch displays all branches 
+
+git checkout branch-name changes to the branch called branch-name
+
+git checkout -b new-branch will create a new branch called new-branch and will switch to it
+
+git checkout - will switch to the last branch you checked out
+
+when merging a branch back into another well do the following
+
+checkout the branch that you will merge into and run
+
+git merge feature-branch
+
+git push
+
+running 
+
+git branch -d feature-branch 
+
+will delete the branch
+
+-----------------------------------
+
+when pushing a change you might get a rejection due to the remote
+containing work that you do not contain, any this case run 
+
+git pull
+
+if there are no conflicts you will be good to go but likely there will be
+and you will get a merge conflict
+
+git status will return which files there are conflicts in
+
+open each of these files and there will be a highlight for where the HEAD is pointing
+and where your code currently stands, pick what you would like, delete the highlights and save, add these changes, commit and push them
+
+-----------------------------------
+
+saving a WIP
+
+git add -A
+git stash
+
+this will save your current changes in a WIP commit and point the head back to where it was before stashing
+
+now you can change to other branches and do as you want and return to what you are working on later
+
+once you are ready to work on this again switch back to this branch and run
+
+git stash apply 
+
+and you will be back where you were, if you have modified files that were stashed you will run into a merge conflict
+
+-----------------------------------
+
+running a command that has a lot of output it will open up in a terminal pager
+
+git blame, diff or log usually makes this happen
+
+usually you get placed into unix less
+
+/something will search for something in your log
+
+clicking n will go to the next result and N to go the previous result
+
+-----------------------------------
+
+the command 
+
+git log
+
+will return all the commits in that repo with newest commits on top
+
+each commit has the commit id, the author, the date and the commit message
+
+we can pass formats to git log like
+
+git log --oneline
+
+will condense commits to one line
+
+git log --decorate
+
+will display all references to our commits
+
+git log --graph
+
+will display an ascii art structure of our commits
+
+git log -p
+
+will show the changes made in each commit
+
+git log --stat
+
+will show the number of insertions and deletions
+
+you can pass more then one of these options in any order
+
+you can also use these flags to filter results
+
+git log -3
+
+returns the 3 most recent commits
+
+git log --after(since)="yesterday" "last week" "30 minutes ago" "mm/dd/yy"
+				--before(until)
+
+returns commits between the flags
+
+git log --author="Michael" you can also pass a regex to this
+
+git log --grep="some commit message" can also be a regex
+
+git log -p -S"something im looking for" make sure theres no space after the S, -p is formatting
+
+git log -p -GsomeRegexHere same as previous but using regex instead of string
+
+git log -i whateverSearch will ignore case
+
+git log --no-merges will return commits that werent merged
+
+git log master..feature-branch will show the commits that are contained between both refs
+
+git log README.md will show only commits related to that specific file, you can pass more then one file
+
+-----------------------------------
+
+git diff shows the differences between remote and local
+
+--- and +++ reference files, + and - reference code inside the file
+
+git diff --cached shows diffs with just whats been staged
+
+git diff HEAD shows staged and unstaged
+
+git diff branch-name shows diffs just from that branch
+
+-----------------------------------
+
+git blame filename.ext
+
+this will show the details of how each line was last modified
+
+git log commitId -p
+
+will show the details of the commit you chose from blame to see more details
+
+-----------------------------------
+
+git tag v1.0.0
+
+will add the tag v1.0.0 (major, minor, patch)
+
+running git tag will return all tags, usually tag is used for versioning
+
+git push --tags will add the tags to the remote
+
+git tag -a v2.0.1 -m "some message" (-a is annotate)
+
+-----------------------------------
+
+to clean up your commits
+
+git rebase -i branch-name (-i is interactive)
+
+this will open up the rebase tool where you can pick, reword, edit, squash, etc
+
+all squased commits will get squased into the highest picked commit
+
+rebase is destructive, dont use it on master
+merge preserves history
+
+git rebase --abort quits the rebase session
+
+-----------------------------------
+
+git bisect start 
+
+this will start a bisect state
+
+git bisect bad
+
+will mark the bad commit once you found it
+
+find the id where it was working and run 
+
+git bisect good commitId
+
+keep searching and add bisect bad to all the ones where there is an issue
+once you find the commit you need run 
+
+git bisect reset
+
+each time you do bisect bad or bisect bad you checkout a new commit to test
+
+-----------------------------------
+
+inside .git there is a hooks folder, each file in hooks is a script
+they start will ext .sample so by default none of these run
+
+inside hooks you can add any script to run before a commit
+for example
+
+npm test && npm run lint
+
+chmod +x hooks/new-hook
+
+so that we can allow our new script to be run
+
+now this script will run before each commit
+
+these hooks will only be available locally, to run them on the remote youll need more complicated scripts or use a prebuild tool
+
+-----------------------------------
+
+git config --global
+
+will write to the .gitconfig root file
+
+to create an alias
+
+git config --global alias.graph 'log --graph --oneline'
+
+to change the standard editor
+
+git config --global core.editor vim
+
+to return condensed version of all configs 
+
+git config --list
+
+-----------------------------------
+
+.gitignore is the file where you add in files you dont want ever to get pushed to the remote
+
+you can use the wildcard *
+
+.gitignore_global is what is used if you want to ignore from all repos on your machine
+once you have this file run
+
+git config --global core.excludefile ~/.gitignore_global
