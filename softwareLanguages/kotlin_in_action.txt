@@ -1766,10 +1766,73 @@ functional interface instance generated from a lambda in a variable
 (5.5)
 
 
+Lets become familiar with a unique
+feature of Kotlin’s lambdas that isn’t available with Java: the ability to call methods of a
+different object in the body of a lambda without any additional qualifiers. Such lambdas
+are called lambdas with receivers
 
 
+fun alphabet(): String {
+	val result = StringBuilder()
+	for (letter in 'A'..'Z') {
+		result.append(letter)
+	}
+	result.append("\nNow I know the alphabet!")
+	return result.toString()
+}
+>>> println(alphabet())
+ABCDEFGHIJKLMNOPQRSTUVWXYZ
+Now I know the alphabet!
 
+In this example, you call several different methods on the result instance and
+repeating the result name in each call. This isn’t too bad, but what if the expression you
+were using was longer or repeated more often?
+Here’s how you can rewrite the code using with:
 
+fun alphabet(): String {
+	val stringBuilder = StringBuilder()
+	return with(stringBuilder)
+		{ for (letter in 'A'..'Z')
+		{
+			this.append(letter)
+		}
+	append("\nNow I know the alphabet!")
+	this.toString()
+	}
+}
+
+Specifies the receiver value on which you’re calling the methods
+
+Calls a method on the receiver value though an explicit "this" 
+
+Calls a method, omitting "this" 
+
+Returns a value from the lambda
+
+The with structure looks like a special construct, but it’s a function that takes two
+arguments: stringBuilder, in this case, and a lambda. The convention of putting the
+lambda outside of the parentheses works here, and the entire invocation looks like a
+built-in feature of the language. Alternatively, you could write this as
+with(stringBuilder, { … }), but it’s less readable.
+
+The apply function works almost exactly the same as with; the only difference is that
+apply() always returns the object passed to it as a parameter (in other words, the
+receiver object). Let’s refactor the alphabet function again, this time using apply:
+
+fun alphabet() = StringBuilder().apply
+	{ for (letter in 'A'..'Z') {
+		append(letter)
+	}
+	append("\nNow I know the alphabet!")
+}.toString()
+
+As you can see, apply is an extension function. The receiver of this function becomes
+the receiver of the lambda passed as an argument. The result of executing
+StringBuilder, so you call toString to convert it to String afterward
+
+Chapter 6, The Kotlin type system
+
+(6.1 6.2)
 
 
 
