@@ -1832,18 +1832,197 @@ StringBuilder, so you call toString to convert it to String afterward
 
 Chapter 6, The Kotlin type system
 
-(6.1 6.2)
+(6.1)
 
 
+The first and probably most important difference between Kotlin’s and Java’s type systems is Kotlin’s explicit support for nullable types. What does this mean? It’s a way to indicate which variables or properties in your program are allowed to be null
+
+/* Java */
+int strLen(String s)
+	{ return
+	s.length(); 
+}
+
+This function is not safe, as passing a null string will cause a nulll pointer exception
+
+If you dont expect a function to be called with a null argument or also any variable or expression that can have a null value then we would write this like this in Kotlin
+
+fun strLen(s: String) = s.length
+
+Calling strLen with an argument that may be null isn’t allowed and will be flagged as error at compile time:
+
+ >>> strLen(null)
+ERROR: Null can not be a value of a non-null type String
+
+The compiler will enforce that you can’t pass an argument containing null.
+
+If you want to allow the use of this function with all arguments, including those that can be null you must do the following
+
+fun strLenSafe(s: String?) = ...
+
+The question mark marks that the value can be null
+
+You can put a question mark after any type, to indicate that the values of this type can store null references: String?, Int?, MyCustomType?, ...
+
+Once you have a value of a nullable type, the set of operations you can perform on it is restricted. For example, you can no longer call methods on it:
+
+>>> fun strLenSafe(s: String?) = s.length()
+ERROR: only safe (?.) or non-null asserted (!!.) calls are allowed
+on a nullable receiver of type kotlin.String?
+
+You can’t assign it to a variable of a non-null type:
+
+>>> val x: String? = null
+>>> var y: String = x
+ERROR: Type mismatch: inferred type is String? but String was expected
+
+You can’t pass it as a parameter to a function expecting a non-null argument:
+
+ >>> strLen(x)
+ERROR: Type mismatch: inferred type is String? but String was expected
+
+So what can you do with it? The most important thing is to compare it with null. And once you perform the comparison, the compiler remembers that and treats the value as being non-null in the scope where the check has been performed. For example, this code is perfectly valid:
+
+fun strLenSafe(s: String?): Int = 
+	if (s != null) s.length else 0
+>>> val x: String? = null >>> println(strLenSafe(x))
+0
+>>> println(strLenSafe("abc"))
+3
+ 
+If using if checks was the only tool for tackling nullability, your code would become verbose fairly quickly. Fortunately, Kotlin provides a number of other tools to help deal with nullable values in a more concise manner.
+
+Nullable types in Kotlin provide a comprehensive solution to this problem. Distinguishing nullable and non-null types provides a clear understanding of what operations are allowed on the value and what operations can lead to exceptions at runtime and are therefore forbidden.
+
+One of the most useful tools in Kotlin’s arsenal is the safe-call operator: ?.. It allows you to combine a null check and a method call into a single operation. For example, the expression s?.toUpperCase() is equivalent to the following, more cumbersome one: if (s != null) s.toUpperCase() else null
+
+Note that the result type of such an invocation is nullable. Although String.toUpperCase returns a value of type String, the result type of an expression s?.toUpperCase() when s is nullable will be String?
+
+Kotlin has a handy operator to provide default values instead of null. It’s called the Elvis operator (or the null-coalescing operator, if you prefer more serious-sounding names for things). It looks like this: ?: (you can visualize it being Elvis if you turn your head sideways). Here’s how it’s used:
+
+fun foo(s: String?) {
+	val t: String = s ?: "" 
+}
+
+If "s" is null, the result is an empty string.
+
+The operator takes two values, and its result is the first value if it isn’t null or the second value if the first one is null
+
+The Elvis operator is often used together with the safe-call operator to substitute a value other than null when the object on which the method is called is null
+
+fun strLenSafe(s: String?): Int = s?.length ?: 0
+>>> println(strLenSafe("abc"))
+3
+>>> println(strLenSafe(null)) 
+0
+
+What makes the Elvis operator particularly handy in Kotlin is that operations such as return and throw work as expressions and therefore can be used on the operator’s right side.
+
+The as? operator tries to cast a value to the specified type and returns null if the value doesn’t have the proper type
+
+The not-null assertion is the simplest and bluntest tool Kotlin gives you for dealing with a value of a nullable type. It’s represented by a double exclamation mark and converts any value to a non-null type. For null values, an exception is thrown
+
+All the let function does is turn the object on which it’s called into a parameter of the lambda. If you combine it with the safe call syntax, it effectively converts an object of a nullable type on which you call let into a non-null type
+
+email?.let { email -> sendEmailTo(it) }
+
+fun sendEmailTo(email: String) 
+	{ println("Sending email to
+	$email") 
+}
+>>> var email: String? = "yole@example.com" >>> email?.let { sendEmailTo(it) }
+Sending email to yole@example.com
+>>> email = null
+>>> email?.let { sendEmailTo(it) }
 
 
+Many frameworks initialize objects in dedicated methods called after the object instance has been created. For example, in Android, the activity initialization happens in the onCreate method. JUnit requires you to put initialization logic in methods annotated with @Before.
+But you can’t leave a non-null property without an initializer in the constructor and only initialize it in a special method. Kotlin normally requires you to initialize all properties in the constructor, and if a property has a non-null type, you have to provide a non-null initializer value. If you can’t provide that value, you have to use a nullable type instead. If you do that, every access to the property requires either anull check or the!! operator
+
+class MyService {
+	fun performAction(): String = "foo" 
+}
+
+class MyTest {
+	private var myService: MyService? = null
+	@Before fun setUp() 
+		{ myService =
+		MyService() 
+	}
+	@Test fun testAction()
+		{ Assert.assertEquals("foo ",
+		myService!!.performAction())
+   	}
+	
+This looks ugly, especially if you access the property many times. To solve this, you can declare the myService property as late-initialized. This is done by applying the lateinit modifier:
+
+class MyService {
+	fun performAction(): String = "foo" 
+}
+class MyTest {
+	private lateinit var myService: MyService
+	@Before fun setUp() { myService =
+	MyService() 
+}
+@Test fun testAction()
+	{ Assert.assertEquals("foo ",
+	myService.performAction())
+  }
+
+Note that a late-initialized property is always a var, because you need to be able to change its value outside of the constructor
 
 
+Defining extension functions for nullable types is one more powerful way to deal with null values. Rather than ensuring that a variable can’t be null before a method call, you can allow the calls with null as a receiver, and deal with null in the function. This is only possible for extension functions; regular method calls are dispatched through the object instance and therefore can never be performed when the instance is null.
 
 
+As an example, consider the functions isEmpty and isBlank, defined as extensions of String in the Kotlin standard library. The first one checks whether the string is an empty string "", and the second one checks whether it’s empty or if it consists solely of whitespace characters. You’ll generally use these functions to check that the string is non- trivial in order to do something meaningful with it. You may think it would be useful to interpret null together with trivial empty or blank strings. And, indeed, you can do so: the functions isEmptyOrNull and isBlankOrNull can be called with a receiver of type String?:
 
+fun verifyUserInput(input: String?)
+	{ if (input.isNullOrBlank()) {
+		println("Please fill in the required fields") }
+}
+>>> verifyUserInput(" ")
+Please fill in the required fields
+>>> verifyUserInput(null)
+Please fill in the required fields
 
+As you can see, you can call an extension function that was declared on a nullable receiver without safe access (see figure 6.7). The function handles possible `null`s itself.
 
+The function isNullOrBlank checks explicitly for null, returning true in this case, and then calls isBlank, which can be called on a non-null String only:
 
+fun String?.isNullOrBlank(): Boolean = t
+	his == null || this.isBlank()
+ 
+(Extension of a nullable String, The second "this" is a smart cast.)
+
+A platform type is essentially a type for which Kotlin doesn’t have nullability information; you can work with it as either a nullable or a non-null type. his means, just as in Java, you have full responsibility for the operations you perform with that type. The compiler will allow all operations. It also won’t highlight as redundant any null-safe operations on such values, which it normally does when you perform a null-safe operation on a value of a non-null type. If you know the value can be null, you can compare it with null before use. If you know it’s not null, you can use it directly. Just as in Java, you’ll get a NullPointerException at the usage site if you get this wrong.
+
+When overriding a Java method in Kotlin, you have a choice whether to declare the parameters and the return type as nullable or non-null. For example, let’s look at a StringProcessor interface in Java:
+
+/* Java */
+interface StringProcessor
+	{ void process(String
+	value);
+}
+
+In Kotlin this could be written in both these ways
+
+class StringPrinter : StringProcessor
+	{ override fun process(value: String)
+	{
+		println(value)
+	}
+}
+
+class NullableStringPrinter : StringProcessor 
+	{ override fun process(value: String?) {
+		if (value != null)
+		{ println(value) }
+	} 
+}
+
+Note that it’s important to get nullability right when implementing methods from Java classes or interfaces. Because the implementation methods can be called from non-Kotlin code, the Kotlin compiler will generate non-null assertions for every parameter that you declare with a non-null type. If the Java code does pass a null value to the method, the assertion will trigger, and you’ll get an exception, even if you never access the parameter value in your implementation.
+
+(6.2)
 
 
