@@ -2023,6 +2023,60 @@ class NullableStringPrinter : StringProcessor
 
 Note that it’s important to get nullability right when implementing methods from Java classes or interfaces. Because the implementation methods can be called from non-Kotlin code, the Kotlin compiler will generate non-null assertions for every parameter that you declare with a non-null type. If the Java code does pass a null value to the method, the assertion will trigger, and you’ll get an exception, even if you never access the parameter value in your implementation.
 
-(6.2)
+(6.2 6.3)
+
+Unlike Java, Kotlin doesn’t differentiate primitive types and wrappers
+
+Also you can’t call methods on primitives or store them in collections.
+
+Thus, to define a collection of integers, you can’t say Collection<int>; you have to use Collection<Integer> instead.
+
+Kotlin doesn’t distinguish between primitive types and wrapper types. You always use the same type (for example, Int):
+
+val i: Int = 1
+val list: List<Int> = listOf(1, 2, 3)
+
+
+The Kotlin Int type can be easily compiled under the hood to the corresponding Java primitive type, because the values of both types can’t store the null reference.
+
+Nullable types in Kotlin can’t be represented by Java primitive types, because null can only be stored in a variable of a Java reference type. That means whenever you use a nullable version of a primitive type in Kotlin, it’s compiled to the corresponding wrapper type.
+
+data class Person(val name: String,
+		val age: Int? = null) {
+	fun isOlderThan(other: Person): Boolean? { if (age == null || other.age ==
+		null)
+			return null
+		return age > other.age }
+}
+>>> println(Person("Sam", 35).isOlderThan(Person("Amy", 42))) false
+>>> println(Person("Sam", 35).isOlderThan(Person("Jane"))) null
+
+
+Note how the regular nullability rules apply here. You can’t just compare two values of type Int?, because one of them may be null. Instead, you have to check that both values aren’t null. After that, the compiler allows you to work with them normally.
+
+One important difference between Kotlin and Java is the way they handle numeric conversions. Kotlin doesn’t automatically convert numbers from one type to the other, even when the other type is larger.
+
+Similar to how Object is the root of the class hierarchy in Java, the Any type is the supertype of all non-nullable types in Kotlin. But in Java, Object is a supertype of all reference types only, and primitive types aren’t part of the hierarchy. That means you have to use wrapper types such as java.lang.Integer whenever Object is required. In Kotlin, Any is a supertype of all types, including the primitive types such as Int.
+
+The Unit type in Kotlin fulfills the same function as void in Java. It can be used as a return type of a function that has nothing interesting to return:
+
+The Nothing type doesn’t have any values, so it only makes sense to use it as a function return type or as a type argument. In all other cases, declaring a variable where you can’t store any value doesn’t make sense.
+Note that functions returning Nothing can be used on the right side of the Elvis operator to perform precondition checking
+
+This example shows why having Nothing in the type system is extremely useful. The compiler knows that a function with this return type never terminates normall and uses that information when analyzing the code calling the function
+
+An important trait that sets apart Kotlin’s collection design from Java’s is that it separates interfaces for accessing the data in a collection and for modifying the data. This distinction exists starting with the most basic interface for working with collections, kotlin.Collection. Using this interface, you can iterate over the elements in a collection, obtain its size, check whether it contains a certain element, and perform other operations that read data from the collection. But this interface doesn’t have any methods for adding or removing elements.
+If you need to modify the data in the collection, you use the kotlin.MutableCollection interface. It extends the regular kotlin.Collection and provides methods for adding and removing the elements, clearing the collection, and so on 
+
+As a general rule, you should use read-only interfaces everywhere in your code. Use the mutable variants only if the code will modify the collection.
+
+
+It’s true that every Kotlin collection is an instance of the corresponding Java collection interface. No conversion is involved when moving between Kotlin and Java; there’s no need for wrappers or copying data. But every Java collection interface has two representations in Kotlin: a read-only one and a mutable one,
+
+All the interfaces Iterable, ... Set, MutableIterable, ...MutableSet are declared in Kotlin. 
+
+
+Chapter 7: Operator overloading and other conventions
+
 
 
