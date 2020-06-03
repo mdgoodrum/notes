@@ -2078,5 +2078,73 @@ All the interfaces Iterable, ... Set, MutableIterable, ...MutableSet are declare
 
 Chapter 7: Operator overloading and other conventions
 
+(7.1 7.2)
+
+Kotlin uses the principle of conventions, instead of relying on types as Java does, because this allows Kotlin to adapt existing Java classes to the requirements of Kotlin language features. The set of interfaces implemented by a class is fixed, and Kotlin can’t modify an existing class so that it would implement additional interfaces. On the other hand, defining new methods for a class is possible through the mechanism of extension functions
+
+The most straightforward example of the use of conventions in Kotlin is arithmetic operators. In Java, the full set of arithmetic operations can be used only with primitive types, and additionally the + operator can be used with String values. But these operations could be convenient in other cases as well. For example, if you’re working with numbers through the BigInteger class, it’s more elegant to sum them using + than to call the add method explicitly. To add an element to a collection, you may want to use the += operator. Kotlin allows you to do that
+
+Well be using a Point class as defined bellow as an example
+
+data class Point(val x: Int, val y: Int)
+
+Here is how we could overload the + operator 
+
+data class Point(val x: Int, val y: Int)
+	{ operator fun plus(other: Point): Point 
+	{
+		return Point(x + other.x, y + other.y) 
+	}
+}
+>>> val p1 = Point(10, 20)
+>>> val p2 = Point(30, 40)
+>>> println(p1 + p2)
+Point(x 40, y 60)
+
+Note how you use the operator keyword to declare the plus function
+
+Here are the names of the operators
+
+times, div, mod, plus, minus
+
+When you define an operator, you don’t need to use the same types for the two operands.
+
+Note that Kotlin operators don’t automatically support commutativity (the ability to swap the left and right sides of an operator). If you want users to be able to write 1.5 * p in addition to p * 1.5, you need to define a separate operator for that: operator fun Double.times(p: Point)
+
+The return type of an operator function can also be different from either of the operand types
+
+Normally, when you define an operator such as plus, Kotlin supports not only the + operation but += as well. Operators such as +=, -=, and so on are called compound assignment operators. Here’s an example:
+
+>>> var point = Point(1, 2) 
+>>> point += Point(3, 4) 
+>>> println(point) 
+Point(x=4, y=6)
+
+If you define a function named plusAssign, with the Unit return type, Kotlin will call it when the += operator is used
+
+The Kotlin standard library supports both approaches for collections. The + and - operators always return a new collection. The += and -= operators work on mutable collections by modifying them in place, and on read-only collections by returning a modified copy. (This means += and -= can only be used with a read-only collection if the variable referencing it is declared as a var.)
+
+The procedure for overloading an unary operator is the same as you saw previously: declare a function (member or extension) with a predefined name, and mark it with the modifier operator
+
+operator fun Point.unaryMinus(): Point
+	{ return Point(-x, -y) 
+}
+>>> val p = Point(10, 20) 
+>>> println(-p) 
+Point(x=-10, y=-20)
+
+Here are the names for the unary operators
+
+unaryPlus, unaryMinus, not, inc, dec
+
+When you define the inc and dec functions to overload increment and decrement operators, the compiler automatically supports the same semantics for pre- and post- increment operators as for the regular number types
+
+Just as with arithmetic operators, Kotlin lets you use comparison operators (==, !=, >, <, and so on) with any object, not just with primitive types. Instead of calling equals or compareTo, as in Java, you can use comparison operators directly, which is intuitive and concise.
+
+As with == being equivalent to calling equals
+Using the != operator is also translated into a call of equals
+
+(7.3 7.4)
+
 
 
