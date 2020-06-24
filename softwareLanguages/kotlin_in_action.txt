@@ -2147,4 +2147,119 @@ Using the != operator is also translated into a call of equals
 (7.3 7.4)
 
 
+In Kotlin, the index operator is one more convention. Reading an element using the index operator is translated into a call of the get operator method, and writing an element becomes a call to set. The methods are already defined for the Map and MutableMap interfaces. Let’s see how to add similar methods to your own class.
 
+You’ll allow the use of square brackets to reference the coordinates of the point: p[0] to access the X coordinate and p[1] to access the Y coordinate. Here’s how to implement and use it:
+
+operator fun Point.get(index: Int): Int
+	{ return when(index) { 
+		0 -> x
+		1 -> y 
+		else ->
+			throw IndexOutOfBoundsException("Invalid coordinate $index") 
+	}
+}
+>>> val p = Point(10, 20) 
+>>> println(p[1])
+20
+
+
+All you need to do is define a function named get and mark it as operator. Once you do that, expressions like p[1], where p has type Point, will be translated into calls to the get method
+
+Note that the parameter of get can have any type, not just Int
+
+x[a, b] -> x.get(a, b)
+
+x[a, b] = c -> x.set(a, b, c)
+
+One other operator supported by collections is the in operator, which is used to check whether an object belongs to a collection. The corresponding function is called contains
+
+Let’s implement it so that you can use the in operator to check whether a point belongs to a rectangle
+
+data class Rectangle(val upperLeft: Point, val lowerRight: Point)
+operator fun Rectangle.contains(p: Point): Boolean { 
+	return p.x in upperLeft.x until lowerRight.x &&
+		p.y in upperLeft.y until lowerRight.y
+}
+>>> val rect = Rectangle(Point(10, 20), Point(50, 50)) 
+>>> println(Point(20, 30) in rect)
+true
+>>> println(Point(5, 5) in rect)
+false
+
+a in c -> c.contains(a)
+
+To create a range, you use the .. syntax: for instance, 1..10 enumerates all the numbers from 1 to 10
+
+start..end -> start.rangeTo(end)
+
+let’s build a range of dates using the LocalDate class
+
+>>> val now = LocalDate.now()
+>>> val vacation = now..now.plusDays(10)
+>>> println(now.plusWeeks(1) in vacation) 
+true
+
+The expression now..now.plusDays(10) is transformed into now.rangeTo(now.plusDays(10))
+
+The rangeTo operator has lower priority than arithmetic operators. But it’s better to use parentheses for its arguments to avoid confusion:
+
+>>> val n = 9
+>>> println(0..(n + 1)) 
+0..10
+
+
+Also note that the expression 0..n.forEach {} won’t compile, because you have to surround a range expression with parentheses to call a method on it
+
+Desctructuring:
+
+>>> val p = Point(10, 20)
+>>> val (x, y) = p 
+>>> println(x)
+10
+>>> println(y)
+20
+
+val (a, b) = p -> val a = p.component1()
+	       -> val b = p.component2()
+
+
+(7.5)
+
+let’s look at one more feature that relies on conventions and is one of the most unique and powerful in Kotlin: delegated properties. This feature lets you easily implement properties that work in a more complex way than storing values in backing fields, without duplicating the logic in each accessor. For example, properties can store their values in database tables, in a browser session, in a map, and so on.
+
+The foundation for this feature is delegation: a design pattern where an object, instead of performing a task, delegates that task to another helper object. The helper object is called a delegate. Here this pattern is applied to a property, which can also delegate the logic of its accessors to a helper object. You can implement that by hand (you’ll see examples in a moment) or use a better solution: Kotlin provides language support for this feature. We’ll begin with a general explanation and then look at specific examples
+
+
+The general syntax of a delegated property is as follows:
+
+class Foo {
+	var p: Type by Delegate() 
+}
+
+The Delegate class might look like the following:
+
+class Delegate {
+	operator fun getValue(...) { ... }
+
+	operator fun setValue(..., value: Type) { ... } 
+}
+
+class Foo {
+	var p: Type by Delegate() 
+}
+>>> val foo = Foo()
+>>> val oldValue = foo.p 
+>>> foo.p = newValue
+
+The getValue method contains the logic for implementing a getter. 
+The setValue method contains the logic for implementing a setter.
+The "by" keyword associates a property with a delegate object. 
+Accessing a property foo.p calls delegate.getValue(...) under the hood. 
+Changing a property value calls delegate.setValue(..., newValue).
+
+
+
+Chapter 8: Higher order functions, lambdas as parameters and return values
+
+(8.1 8.2)
