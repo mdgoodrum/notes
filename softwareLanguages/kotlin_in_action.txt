@@ -2263,3 +2263,140 @@ Changing a property value calls delegate.setValue(..., newValue).
 Chapter 8: Higher order functions, lambdas as parameters and return values
 
 (8.1 8.2)
+
+Storing a lambda in a local variable
+
+val sum = { x: Int, y: Int -> x + y } 
+val action = { println(42) }
+
+In this case, the compiler infers that both the sum and action variables have function types
+
+explicit type declaration for these variables
+
+val sum: (Int, Int) -> Int = { x, y -> x + y } 
+val action: () -> Unit = { println(42) }
+
+Unit type is used to specify that a function returns no meaningful value. The Unit return type can be omitted when you declare a regular
+function, but a function type declaration always requires an explicit return type, so you can’t omit Unit in this context
+
+Just like with any other function, the return type of a function type can be marked as nullable
+
+var canReturnNull: (Int, Int) -> Int? = { null }
+
+To specify that the variable itself, rather than the return type of the function, is nullable, you need to enclose the entire function type definition in parentheses and put the question mark after the parentheses:
+
+var funOrNull: ((Int, Int) -> Int)? = null
+
+Note the subtle difference between this example and the previous one. If you omit the parentheses, you’ll declare a function type with a nullable return type, and not a nullable variable of a function type
+
+fun twoAndThree(operation: (Int, Int) -> Int)
+	{ val result = operation(2, 3)
+	println("The result is $result") 
+}
+>>> twoAndThree { a, b -> a + b } The result is 5
+>>> twoAndThree { a, b -> a * b } The result is 6
+
+Kotlin functions that use function types can be called easily from Java. Java 8 lambdas are automatically converted to values of function types
+
+/* Kotlin declaration */
+fun processTheAnswer(f: (Int) -> Int)
+	{ println(f(42)) 
+}
+
+/* Java */
+>>> processTheAnswer(number -> number + 1); 
+43
+
+
+n Java, you can easily use extension functions from the Kotlin standard library that expect lambdas as arguments. Note, however, that they don’t look as nice as in Kotlin— you have to pass a receiver as a first argument explicitly:
+
+/* Java */
+>>> List<String> strings = new ArrayList();
+>>> strings.add("42");
+CollectionsKt.forEach(strings, s -> { 
+	System.out.println(s);
+	return Unit.INSTANCE; 
+});
+
+In Java, your function or lambda can return Unit. But because the Unit type has a value in Kotlin, you need to return it explicitly. You can’t pass a lambda returning void as an argument of a function type that returns Unit
+
+When you declare a parameter of a function type, you can also specify its default value
+
+Due to the way inlining is performed, not every function that uses lambdas can be inlined. When the function is inlined, the body of the lambda expression that’s passed as an argument is substituted directly into the resulting code. That restricts the possible uses of the corresponding parameter in the function body. If this parameter is called, such code can be easily inlined. But if the parameter is stored somewhere for further use, the code of the lambda expression can’t be inlined, because there must be an object that contains this code
+
+Using the inline keyword can improve performance only with functions that take lambdas as parameters
+
+(8.3)
+
+If you use the return keyword in a lambda, it returns from the function in which you called the lambda, not just from the lambda itself. Such a return statement is called a non-local return, because it returns from a larger block than the block containing the return statement
+
+o understand the logic behind the rule, think about using a return keyword in a for loop or a synchronized block in a Java method. It’s obvious that it returns from the method and not from the loop or block. Kotlin allows you to preserve the same behavior when you switch from language features to functions that take lambdas as arguments.
+
+Note that the return from the outer function is possible only if the function that takes the lambda as an argument is inlined
+
+You can write a local return from a lambda expression as well. A local return in a lambda is similar to a break expression in a for loop
+
+To distinguish a local return from a non-local one, you use labels. You can label a lambda expression from which you want to return, and then refer to this label after the return keyword
+
+fun lookForAlice(people: List<Person>) 
+	{ people.forEach label@{
+		if (it.name == "Alice") return@label 
+	}
+	println("Alice might be somewhere") 
+}
+>>> lookForAlice(people) 
+Alice might be somewhere
+
+Anonymous functions follow the same rules as regular functions for specifying the return type. Anonymous functions with a block body
+
+If you use an expression body, you can omit the return type.
+
+Inside an anonymous function, a return expression without a label returns from the anonymous function, not from the enclosing one. The rule is simple: return returns from the closest function declared using the fun keyword. Lambda expressions don’t use the fun keyword, so a return in a lambda returns from the outer function. Anonymous functions do use fun; therefore, in the previous example, the anonymous function is the closest matching function. Consequently, the return expression returns from the anonymous function, not from the enclosing one.
+
+Chapter 9: Generics
+
+(9.1 9.2)
+
+Generics allow you to define types that have type parameters. When an instance of such a type is created, type parameters are substituted with specific types called type arguments. For example, if you have a variable of type List, it’s useful to know what kind of things are stored in that list. The type parameter lets you specify exactly that— instead of "This variable holds a list," you can say something like "This variable holds a list of strings." Kotlin’s syntax for saying "a list of strings" looks the same as in
+Java: List<String>. You can also declare multiple type parameters for a class. For example, the Map class has type parameters for the key type and the value type: Map<String, Person>.
+
+Just as with types in general, type arguments can often be inferred by the Kotlin compiler:
+
+val authors = listOf("Dmitry", "Svetlana")
+
+Because the two values passed to the listOf() function are both strings, the compiler infers that you’re creating a List<String>. On the other hand, if you need to create an empty list, there’s nothing from which to infer the type parameter, so you need to specify it explicitly.
+
+Just as in Java, you declare a Kotlin generic class or interface by putting angle brackets after the class name and the type parameters in the angle brackets. Once you do that, you can use the type parameters in the body of the class, just like any other types
+
+Type parameter constraints let you restrict the types that can be used as type arguments for a class or function. For example, consider a function that calculates the sum of elements in a list. It can be used on a List<Int> or a List<Double>, but not, for example, a List<String>. To express this, you can define a type parameter constraint that specifies that the type parameter of sum must be a number
+
+To specify a constraint, you put a colon after the type parameter name, followed by the type that’s the upper bound for the type parameter
+
+fun <T : Number> List<T>.sum(): T
+
+T: type parameter
+Number: upper bound
+
+The actual type argument (Int in the following example) should extend Number to allow this function invocation
+
+>>> println(listOf(1, 2, 3).sum())
+6
+
+Just as in Java, Kotlin’s generics are erased at runtime
+
+Because type arguments aren’t stored, you can’t check them—for example, you can’t check whether a list contains strings rather than other objects. As a general rule, it’s not possible to use types with type parameters in is checks
+
+Even though it’s perfectly possible to find out at runtime that value is a List, you can’t tell whether it’s a list of strings, persons, or something else
+
+When you call a generic function, in its body you can’t determine the type arguments it was invoked with
+
+This is true in general, but there’s one case where this limitation can be avoided: inline functions. Type parameters of inline functions can be reified, which means you can refer to actual type arguments at runtime
+
+if you mark a function with the inline keyword, the compiler will replace every call to the function with the actual code implementing the function. Making the function inline may improve performance if this function uses lambdas as arguments
+
+(9.3)
+
+
+
+
+
