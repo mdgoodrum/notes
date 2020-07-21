@@ -2396,6 +2396,52 @@ if you mark a function with the inline keyword, the compiler will replace every 
 
 (9.3)
 
+In the simplest case, with a non-generic class, the name of the class can be used directly as a type. For example, if you write var x: String, you declare a variable that can hold instances of the String class. But note that the same class name can also be used to declare a nullable type: var x: String?. This means each Kotlin class can be used to construct at least two types
+
+A covariant class is a generic class (we’ll use Producer<T> as an example) for which the following holds: Producer<A> is a subtype of Producer<B> if A is a subtype of B. We say that the subtyping is preserved. For example, Producer<Cat> is a subtype of Producer<Animal> because Cat is a subtype of Animal.
+
+In Kotlin, to declare the class to be covariant on a certain type parameter, you put the out keyword before the name of the type parameter
+
+Marking a type parameter of a class as covariant makes it possible to pass values of that class as function parameters and return values when the type arguments don’t exactly match the ones in the function definition
+
+star-projection syntax you can use to indicate that you have no information about a generic argument. For example, a list of elements of an unknown type is expressed using that syntax as List<*>
+
+
+Chapter 10: Annotations and Reflection
+
+(10.1 10.2)
+
+To apply an annotation, you put its name, prefixed with the @ character, in the beginning of the declaration you’re annotating. You can annotate different code elements, such as methods or classes
+
+For example in JUNIT @Test annotation instructs the JUnit framework to invoke this method as a test
+
+let’s look at the @Deprecated annotation. Its meaning in Kotlin is the same as in Java, but Kotlin enhances it with the replaceWith parameter, which lets you provide a replacement pattern to support smooth transition to a new version of the API. The example below shows how you can provide arguments for the annotation: a deprecation message and a replacement pattern
+
+@Deprecated("Use removeAt(index) instead.", ReplaceWith("removeAt(index)"))
+fun remove(index: Int) { ... }
+
+With this declaration, if someone uses the function remove, IntelliJ IDEA will not only show what function should be used instead (removeAt in the example above), but also offer a quick fix to replace it automatically
+
+Annotations can have parameters of the following types only: primitive types, strings, enums, class references, other annotation classes and arrays thereof
+
+In many cases a single declaration in the Kotlin source code corresponds to multiple Java declarations, and each of them can carry annotations. For example, a Kotlin property corresponds to a Java field, getter, and possibly a setter, as well as the parameters of the accessors. A property declared in the primary constructor has one more corresponding element: the constructor parameter. Therefore, it may be necessary to specify which of these elements needs to be annotated
+
+@get:Rule
+
+Use-site target : annotation name
+
+The @JsonExclude annotation has the simplest form, because it doesn’t have any parameters:
+
+annotation class JsonExclude
+
+The syntax looks like a regular class declaration, with the added annotation modifier before the class keyword. Since annotation classes are only used to define the structure of metadata associated with declarations and expressions, they cannot contain any code. Therefore, the compiler prohibits specifying a body for an annotation class.
+
+For annotations that have parameters, the parameters are declared in the primary constructor of the class:
+
+annotation class JsonName(val name: String)
+
+Reflection is, simply put, a way to access properties and methods of objects dynamically at runtime, without knowing in advance what those properties are.
+
 
 
 
